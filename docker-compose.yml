@@ -1,6 +1,7 @@
 version: "3.9"
 services:
   jupyter-lab:
+    platform: "linux/amd64"
     build: 
       dockerfile: ./docker/Dockerfile-mamba
       context: ./

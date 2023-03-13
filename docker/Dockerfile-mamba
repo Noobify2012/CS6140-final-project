@@ -6,7 +6,6 @@ RUN apt-get update && apt-get upgrade && apt-get install -y \
     wget
 RUN mkdir /download 
 RUN wget -O /download/${MAMBA_INSTALL} https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh
-# RUN wget -O /download/${MAMBA_INSTALL} https://github.com/conda-forge/miniforge/releases/download/22.11.1-4/Mambaforge-22.11.1-4-MacOSX-arm64.sh
 RUN chmod +x /download/${MAMBA_INSTALL}
 RUN /download/${MAMBA_INSTALL} -b -p ${MAMBA_DIR}
 # RUN source ${MAMBA_DIR}/etc/profile.d/conda.sh
@@ -17,19 +16,6 @@ RUN mamba init bash
 FROM mamba-setup AS env-setup
 ARG ENV_FILE='environment.yml'
 COPY ./${ENV_FILE} /app/${ENV_FILE}
-# ENV PROJ_ENV=$(cat ${ENV_FILE} | awk 'NR==1{print $2}')
 RUN mamba env update -n root -f /app/${ENV_FILE}
-# RUN conda env create ${PROJ_ENV}
-# RUN mamba env create -f ./${ENV_FILE}
-# RUN mamba env create -f ./${ENV_FILE}
-# SHELL ["mamba", "run", "-n", "${PROJ_ENV}", "/bin/bash", "-l", "-c"]
-# SHELL ["mamba", "run", "-n", "cs6140", "/bin/bash", "-l", "-c"]
-# SHELL ["bash", "-l", "-c"
-# CMD ["mamba", "run", "-n", "cs6140", "jupyter", "lab", "--allow-root", '--port=8888', '--ip=0.0.0.0']
-# CMD ["mamba", "run", "jupyter", "lab", "--allow-root", '--port=8888', '--ip=0.0.0.0']
-# CMD mamba run -n cs6140 jupyter lab --allow-root --port=8888 --no-browser --ip=0.0.0.0
-# RUN chmod +x /usr/bin/tini
-# ENTRYPOINT ["/usr/bin/tini", "--"]
-# CMD ["mamba", "run", "jupyter", "lab", "--allow-root", '--port=8888', '--ip=0.0.0.0']
 WORKDIR /app
 CMD ["python3"]
