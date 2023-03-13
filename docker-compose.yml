@@ -1,0 +1,38 @@
+version: "3.9"
+services:
+  jupyter-lab:
+    build: 
+      dockerfile: ./docker/Dockerfile-mamba
+      context: ./
+    command: >
+      jupyter lab 
+        --allow-root 
+        --NotebookApp.allow_origin='*'
+        --port=8888 
+        --ip=0.0.0.0 
+        --no-browser 
+        --NotebookApp.token=''
+        --browser=False
+        --NotebookApp.disable_check_xsrf=True
+    ports:
+      - "8888:8888"
+    volumes:
+      - type: bind
+        source: .
+        target: /app
+  db-flights:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - db-volume:/var/lib/postgresql/data
+
+volumes:
+  db-volume:
+    driver: local
+
+  
