@@ -6,6 +6,7 @@ RUN apt-get update && apt-get upgrade && apt-get install -y \
     wget
 RUN mkdir /download 
 RUN wget -O /download/${MAMBA_INSTALL} https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh
+# RUN wget -O /download/${MAMBA_INSTALL} https://github.com/conda-forge/miniforge/releases/download/22.11.1-4/Mambaforge-22.11.1-4-MacOSX-arm64.sh
 RUN chmod +x /download/${MAMBA_INSTALL}
 RUN /download/${MAMBA_INSTALL} -b -p ${MAMBA_DIR}
 # RUN source ${MAMBA_DIR}/etc/profile.d/conda.sh
