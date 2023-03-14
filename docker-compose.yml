@@ -40,10 +40,10 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - db-volume:/var/lib/postgresql/data
+      - flights-db-volume:/var/lib/postgresql/data
 
 volumes:
-  db-volume:
+  flights-db-volume:
 
 networks:
   cs6140-network:
