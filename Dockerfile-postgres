@@ -1,0 +1,3 @@
+FROM postgres:latest
+ARG SQL_FILE='create-db.sql'
+COPY ./res/${SQL_FILE} /docker-entrypoint-initdb.d/${SQL_FILE}

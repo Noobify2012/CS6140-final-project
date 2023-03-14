@@ -1,9 +1,10 @@
 version: "3.9"
 services:
   jupyter-lab:
+    container_name: 'jupyter-lab'
     platform: "linux/amd64"
     build: 
-      dockerfile: ./docker/Dockerfile-mamba
+      dockerfile: ./Dockerfile-mamba
       context: ./
     command: >
       jupyter lab 
@@ -15,18 +16,27 @@ services:
         --NotebookApp.token=''
         --browser=False
         --NotebookApp.disable_check_xsrf=True
+    networks:
+      - cs6140-network
     ports:
-      - "8888:8888"
+      - '8888:8888'
     volumes:
       - type: bind
         source: .
         target: /app
-  db-flights:
-    image: postgres
-    restart: always
+
+  flights-db:
+    container_name: 'flights-db'
+    platform: "linux/amd64"
+    build:
+      dockerfile: ./Dockerfile-postgres
+    restart: unless-stopped
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=flights
+    networks:
+      - cs6140-network
     ports:
       - '5432:5432'
     volumes:
@@ -34,6 +44,6 @@ services:
 
 volumes:
   db-volume:
-    driver: local
 
-  
+networks:
+  cs6140-network:
