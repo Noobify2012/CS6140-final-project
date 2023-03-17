@@ -8,18 +8,18 @@ services:
       context: ./
     command: >
       jupyter lab 
-        --allow-root 
-        --NotebookApp.allow_origin='*'
-        --port=8888 
+      er 
+        --port=8889 
         --ip=0.0.0.0 
         --no-browser 
-        --NotebookApp.token=''
+        --IdentityProvider.token=''
+        --ServerApp.password=''
         --browser=False
-        --NotebookApp.disable_check_xsrf=True
+        --ServerApp.disable_check_xsrf=True
     networks:
       - cs6140-network
     ports:
-      - '8888:8888'
+      - '8889:8889'
     volumes:
       - type: bind
         source: .
