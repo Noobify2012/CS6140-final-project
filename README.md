@@ -33,12 +33,13 @@ If you need to add libraries to the `jupyter-lab` service, it's easiest to do fr
     > *note:* sometimes library names are different between pip and conda/mamba, so its best to do a google search for the library with the term 'conda-forge' added.
 1. Once installed, run `mamba env export > environment.yml` to "update" the environment file.
 
-This update will persist during docker compose up/down operations.
-If you remove the docker image for `jupyter-lab`, since you've updated the `environment.yml` file that's part of the repo, and new image creation will cause docker to rebuild the image now with the new library.
+This update will persist during `docker compose up/down` operations.
 
-Don't forget to `git add environment.yml` and push if you want others to have the library as well :)
+If you're pulling a branch with this change, you'll need to remove the docker image for jupyter-lab using `docker rmi cs6140-final-project-jupyter-lab`
 
-## Updating the PostgreSQL Iimage
+Don't forget to `git add environment.yml` and push to git!
+
+## Updating the PostgreSQL Image
 The Postgres image should be pretty self-contained. 
 There is an attached docker volume which will persist between bringing the service up and down.
 Not, this *is not* stored in git, so if you nuke the volume, you'll lose any changes you made to the DB that aren't committed to the relevant docker and sql files.
