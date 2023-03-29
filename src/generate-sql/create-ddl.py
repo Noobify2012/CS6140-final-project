@@ -31,10 +31,22 @@ def main(file):
 
 
 def generate_ddl_text(labels, create_id=True, extras={}, ending=''):
+    db_name = 'flights_db'
+    table_name = 'flights'
     spacer = '    '
-    file_start = f"DROP TABLE IF EXISTS flights;\nCREATE TABLE flights (\n"
-    file_end = ');'
-    insert_string = spacer + "{label:50}{type:20}{extra}\n"
+    file_start = dedent(f"""\
+    CREATE DATABASE {db_name};
+    CREATE USER admin WITH PASSWORD 'admin';
+    ALTER USER admin WITH SUPERUSER;
+    \c {db_name};
+    CREATE TABLE {table_name}(
+    """)
+    file_end = dedent(f"""\
+    CREATE USER read_user WITH PASSWORD 'read_user';
+    GRANT SELECT ON ALL TABLES IN SCHEMA public TO read_user;
+    ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO read_user;
+    """)
+    insert_string = spacer + "{label:50}{type:20}{extra},\n"
     ddl_string = file_start
 
     if create_id:
@@ -45,7 +57,8 @@ def generate_ddl_text(labels, create_id=True, extras={}, ending=''):
         extra = extras[label] if label in extra_keys else '' 
         ddl_string += insert_string.format(label=label, type=type, extra=extra)
     
-    ddl_string += ending + file_end
+    ddl_string = ddl_string[:-2]
+    ddl_string += '\n' + ending + ');\n' + file_end
     return ddl_string
 
 def output_ddl_file(ddl_text, file_path, overwrite=False):
