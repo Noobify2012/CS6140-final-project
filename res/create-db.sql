@@ -1,9 +1,7 @@
--- CREATE DATABASE flights;
-DROP TABLE IF EXISTS demo;
-CREATE TABLE demo (
-    id SERIAL PRIMARY KEY,
-    title VARCHAR NOT NULL
+DROP TABLE IF EXISTS flights;
+CREATE TABLE flights (
+    id                                                SERIAL              PRIMARY KEY
+    Year                                              SMALLINT            NOT NULL
+    Month                                             SMALLINT            
+    DayofMonth                                        SMALLINT            
 );
-INSERT INTO demo(id, title) VALUES
-    (1, 'testing'),
-    (2, 'today');
