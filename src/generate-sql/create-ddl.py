@@ -2,8 +2,10 @@
 create-ddl.py
 email: blum.da@northeastern.edu
 """
+import os
 import pandas as pd
 
+from dotenv import load_dotenv
 from pathlib import Path
 from textwrap import dedent
 
@@ -31,6 +33,7 @@ def main(file):
 
 
 def generate_ddl_text(labels, create_id=True, extras={}, ending=''):
+    
     db_name = 'flights_db'
     table_name = 'flights'
     spacer = '    '

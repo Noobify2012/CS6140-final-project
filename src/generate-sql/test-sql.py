@@ -19,5 +19,5 @@ try:
     column_names = cur.fetchall()
     print(column_names)
 
-except (Exception, psycopg2.DatabaseError) as err:
-    print(err)
+except (Exception, psycopg2.Databaseerroror) as error:
+    print(error)
