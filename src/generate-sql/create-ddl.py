@@ -18,15 +18,17 @@ def main():
         labels = yaml.safe_load(f)
     ddl_text = generate_ddl_text(
         db_name=os.getenv("PG_DATABASE"),
-        table_name=labels['table_name'],
-        columns=labels["columns"], 
-        extras=labels["extras"]
+        table_name=labels["table_name"],
+        columns=labels["columns"],
+        extras=labels["extras"],
     )
     file_name = Path.cwd() / "res" / "create-db.sql"
     output_ddl_file(ddl_text=ddl_text, file_path=file_name, overwrite=True)
 
 
-def generate_ddl_text(db_name, table_name, columns, create_id=True, extras={}, ending=""):
+def generate_ddl_text(
+    db_name, table_name, columns, create_id=True, extras={}, ending=""
+):
     # db_name = "flights_db"
     # table_name = "flights"
     spacer = "    "
@@ -57,7 +59,9 @@ def generate_ddl_text(db_name, table_name, columns, create_id=True, extras={}, e
     extra_keys = extras.keys()
     for column, type in columns.items():
         extra = extras[column] if column in extra_keys else ""
-        ddl_string += insert_string.format(label=column, type=type, extra=extra)
+        ddl_string += insert_string.format(
+            label=column, type=type, extra=extra
+        )
 
     ddl_string = ddl_string[:-2]
     ddl_string += "\n" + ending + ");\n" + file_end
