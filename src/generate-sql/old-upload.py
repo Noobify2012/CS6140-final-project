@@ -8,32 +8,32 @@ import dateutils
 import pandas as pd
 from pathlib import Path
 
+
 def try_eval(val):
-    r = ''
+    r = ""
     try:
         r = ast.literal_eval(val)
     except Exception:
-        return val 
+        return val
     return r
 
 
-def get_postgres_type(csv_field : str) -> str:
-    '''Tests the type of a str in python and returns its postgres equivalent
-    '''
-    stripped = csv_field.replace('"', '').strip()
+def get_postgres_type(csv_field: str) -> str:
+    """Tests the type of a str in python and returns its postgres equivalent"""
+    stripped = csv_field.replace('"', "").strip()
     t = try_eval(stripped)
     match t:
         case int():
-            return 'BIGINT'
+            return "BIGINT"
         case bool():
-            return 'BOOLEAN'
+            return "BOOLEAN"
         case float():
-            return 'DOUBLE PRECISION'
+            return "DOUBLE PRECISION"
         case _:
-            if stripped != '':
-                return 'VARCHAR'
+            if stripped != "":
+                return "VARCHAR"
             else:
-                return '__FILL ME__'
+                return "__FILL ME__"
 
 
 # SCRIPT ---------------------------------------------------------------------
@@ -74,14 +74,14 @@ def get_postgres_type(csv_field : str) -> str:
 #     'IATA_Code_Originally_Scheduled_Code_Share_Airline': 'str',
 #     'Div2Airport': 'str',
 #     'Div2TailNum': 'str',
-    # 'Duplicate': 'bool'
+# 'Duplicate': 'bool'
 # }
 # df = pd.read_csv(csv_file, index_col=False, dtype = mixed_column_types, parse_dates=['FlightDate'], nrows=8000)
 # df = pd.read_csv(csv_file, index_col=False, nrows=8000)
 # df = df.drop(columns=['Unnamed: 119'])
 # df['Duplicate'] = df['Duplicate'].map({'N': False, 'Y': True})
 
-shitty_i = 0;
+shitty_i = 0
 single_row = df.iloc[0].to_numpy()
 # print(df.iat[0,1])
 for name, dtype in df.dtypes.items():
@@ -89,7 +89,9 @@ for name, dtype in df.dtypes.items():
     item = single_row[shitty_i]
     # item = df.iat[0, shitty_i].replace('"', '').strip()
     df_item = df.iat[0, shitty_i]
-    print(f'{shitty_i:.<9}{name:.<50}{df_item:.^20}{item:.^20}{str(dtype):.>20}')
+    print(
+        f"{shitty_i:.<9}{name:.<50}{df_item:.^20}{item:.^20}{str(dtype):.>20}"
+    )
     shitty_i += 1
 
 
@@ -104,14 +106,3 @@ for name, dtype in df.dtypes.items():
 # print(df.iloc[:,[93]].dropna())
 
 # sql = df.to_sql('')
-
-
-
-
-
-
-
-
-
-
-
