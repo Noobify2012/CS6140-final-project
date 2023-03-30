@@ -17,6 +17,10 @@ services:
         --ServerApp.password=''
         --browser=False
         --ServerApp.disable_check_xsrf=True
+    deploy:
+      resources:
+        limits:
+          memory: 32GB
     networks:
       - cs6140-network
     ports:
