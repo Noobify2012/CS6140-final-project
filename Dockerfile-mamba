@@ -2,7 +2,7 @@ FROM debian:latest AS mamba-setup
 ARG MAMBA_DIR='/mamba'
 ARG MAMBA_INSTALL=mamba-install.sh
 SHELL ["/bin/bash", "-c"]
-RUN apt-get update && apt-get upgrade && apt-get install -y \
+RUN apt-get update && apt-get upgrade -y && apt-get install -y \
     wget
 RUN mkdir /download 
 RUN wget -O /download/${MAMBA_INSTALL} https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh
