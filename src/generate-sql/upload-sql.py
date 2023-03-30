@@ -24,7 +24,7 @@ def main():
         "username": os.getenv("PG_ADMIN"),
         "password": os.getenv("PG_ADMIN_PASSWORD"),
     }
-    yaml_file = Path.cwd() / "res" / "labels.yml"
+    yaml_file = Path.cwd() / "res" / "flights_table.yml"
     with open(yaml_file, "r") as f:
         labels = yaml.safe_load(f)
     # test_csv = Path.cwd() / "res" / "test.csv"

@@ -11,23 +11,24 @@ from pathlib import Path
 from textwrap import dedent
 
 
-def main(file):
-
-    yaml_file = Path.cwd() / "res" / "labels.yml"
-    with open(yaml_file, 'r') as f:
+def main():
+    load_dotenv(Path.cwd() / ".env")
+    yaml_file = Path.cwd() / "res" / "flights_table.yml"
+    with open(yaml_file, "r") as f:
         labels = yaml.safe_load(f)
-
-
-    # extras = {"Year": "NOT NULL"}
-
-    ddl_text = generate_ddl_text(labels=labels['columns'], extras=labels['extras'])
+    ddl_text = generate_ddl_text(
+        db_name=os.getenv("PG_DATABASE"),
+        table_name=labels['table_name'],
+        columns=labels["columns"], 
+        extras=labels["extras"]
+    )
     file_name = Path.cwd() / "res" / "create-db.sql"
     output_ddl_file(ddl_text=ddl_text, file_path=file_name, overwrite=True)
 
 
-def generate_ddl_text(labels, create_id=True, extras={}, ending=""):
-    db_name = "flights_db"
-    table_name = "flights"
+def generate_ddl_text(db_name, table_name, columns, create_id=True, extras={}, ending=""):
+    # db_name = "flights_db"
+    # table_name = "flights"
     spacer = "    "
     file_start = dedent(
         f"""\
@@ -54,9 +55,9 @@ def generate_ddl_text(labels, create_id=True, extras={}, ending=""):
         )
 
     extra_keys = extras.keys()
-    for label, type in labels.items():
-        extra = extras[label] if label in extra_keys else ""
-        ddl_string += insert_string.format(label=label, type=type, extra=extra)
+    for column, type in columns.items():
+        extra = extras[column] if column in extra_keys else ""
+        ddl_string += insert_string.format(label=column, type=type, extra=extra)
 
     ddl_string = ddl_string[:-2]
     ddl_string += "\n" + ending + ");\n" + file_end
@@ -70,6 +71,6 @@ def output_ddl_file(ddl_text, file_path, overwrite=False):
 
 
 if __name__ == "__main__":
-    file = Path.cwd() / "res" / "test.csv"
-    main(file)
+    # file = Path.cwd() / "res" / "test.csv"
+    main()
     # generate_ddl(file)
