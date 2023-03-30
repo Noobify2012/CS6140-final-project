@@ -28,24 +28,24 @@ def main():
         "Month": "SMALLINT",
         "DayofMonth": "SMALLINT"
     }
-    columns = list(labels.keys())
-
+    
     test_csv = Path.cwd() / "res" / "test.csv"
-    df = pd.read_csv(test_csv, low_memory=False)
+    upload_file(credentials=server_creds, csv_file=test_csv, labels=labels)
+
+
+def upload_file(credentials : dict[str, str], csv_file : Path, labels : dict[str, str]):
+    columns = list(labels.keys())
+    df = pd.read_csv(csv_file, low_memory=False)
     reduced_df = df[columns]
-    print(reduced_df.columns.values)
-
-    server_url = URL.create(**server_creds)
-    print(server_url)
-
+    server_url = URL.create(**credentials)
     try:
         db = create_engine(server_url)
         conn = db.connect()
-        # conn = psycopg2.connect(**server_creds)
         reduced_df.to_sql('flights', con=conn, if_exists='replace')
         conn.commit()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
+
 
 
 if __name__ == '__main__':
