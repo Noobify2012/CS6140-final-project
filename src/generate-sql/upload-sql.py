@@ -27,11 +27,13 @@ def main():
     yaml_file = Path.cwd() / "res" / "labels.yml"
     with open(yaml_file, "r") as f:
         labels = yaml.safe_load(f)
-    test_csv = Path.cwd() / "res" / "test.csv"
+    # test_csv = Path.cwd() / "res" / "test.csv"
+    flight_2018_raw_csv = Path.cwd() / "raw" / "Flights_2018_1.csv"
     upload_file(
         credentials=server_creds,
         table_name=labels["table_name"],
-        csv_file=test_csv,
+        # csv_file=test_csv,
+        csv_file=flight_2018_raw_csv,
         labels=labels["columns"],
     )
 

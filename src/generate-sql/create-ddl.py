@@ -12,18 +12,15 @@ from textwrap import dedent
 
 
 def main(file):
-    # labels = {
-    #     "Year": "SMALLINT",
-    #     "Month": "SMALLINT",
-    #     "DayofMonth": "SMALLINT",
-    # }
+
     yaml_file = Path.cwd() / "res" / "labels.yml"
     with open(yaml_file, 'r') as f:
         labels = yaml.safe_load(f)
 
-    extras = {"Year": "NOT NULL"}
 
-    ddl_text = generate_ddl_text(labels=labels['columns'], extras=extras)
+    # extras = {"Year": "NOT NULL"}
+
+    ddl_text = generate_ddl_text(labels=labels['columns'], extras=labels['extras'])
     file_name = Path.cwd() / "res" / "create-db.sql"
     output_ddl_file(ddl_text=ddl_text, file_path=file_name, overwrite=True)
 
