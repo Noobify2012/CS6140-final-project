@@ -1,0 +1,46 @@
+[tool.poetry]
+name = "cs6140-final-project/generate-sql"
+version = "0.1.0"
+description = "To infinity, and beyond!"
+authors = [
+    "Daniel Blum <blum.da@northeastern.edu>",
+    "Matt Greene <greene.matthew@northeastern.edu>",
+    "Bram Ziltzer <ziltzer.b@northeastern.edu>",
+]
+readme = "README.md"
+packages = [{include = "generate-sql", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "~3.10"
+black = "^23.3.0"
+pandas = "^1.5.3"
+psycopg2-binary = "^2.9.5"
+python-dotenv = "^1.0.0"
+sqlalchemy = "^2.0.7"
+pyyaml = "^6.0"
+
+[tool.black]
+line-length = 79
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+
+  # The following are specific to Black, you probably don't want those.
+  | blib2to3
+  | tests/data
+  | profiling
+)/
+'''
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

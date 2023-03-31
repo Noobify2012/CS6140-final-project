@@ -1,0 +1,8 @@
+table_name: 'flights'
+columns:
+  Year: SMALLINT
+  Month: SMALLINT
+  DayofMonth: SMALLINT
+
+extras:
+  Year: NOT NULL
