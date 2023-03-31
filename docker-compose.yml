@@ -17,6 +17,10 @@ services:
         --ServerApp.password=''
         --browser=False
         --ServerApp.disable_check_xsrf=True
+    deploy:
+      resources:
+        limits:
+          memory: 32GB
     networks:
       - cs6140-network
     ports:
@@ -35,7 +39,6 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=flights
     networks:
       - cs6140-network
     ports:
@@ -43,8 +46,25 @@ services:
     volumes:
       - flights-db-volume:/var/lib/postgresql/data
 
+  pgadmin:
+    image: dpage/pgadmin4
+    platform: "linux/amd64"
+    container_name: 'pgadmin'
+    restart: always
+    networks:
+      - cs6140-network
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL : test@test.com
+      PGADMIN_DEFAULT_PASSWORD : test
+    volumes:
+      - pgadmin-volume:/var/lib/pgadmin
+
+
 volumes:
   flights-db-volume:
+  pgadmin-volume:
 
 networks:
   cs6140-network:
