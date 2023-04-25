@@ -158,4 +158,5 @@ def encodeFrame(frame:pd.DataFrame):
 
 def columnManager(frame:pd.DataFrame):
     frame = frame[['Year', 'Month', 'DayofMonth', 'Operating_Airline', 'Origin', 'Dest', 'ArrDel15', 'DistanceGroup', 'CarrierDelay', 'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay', 'Duplicate']].copy()
+
     return frame

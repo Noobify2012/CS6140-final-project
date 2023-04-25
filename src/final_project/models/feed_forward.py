@@ -1,32 +1,25 @@
 import torch.nn as nn
 import torch
 from tqdm import tqdm
-from sklearn.metrics import precision_recall_fscore_support
+from sklearn.metrics import classification_report
 from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
 from torch.utils.data import DataLoader
 from torch.utils.data import TensorDataset
 
 class FeedForward(nn.Module):
-    def __init__(self, num_hidden_layers, num_nodes:int, num_features: int) -> None:
+    def __init__(self, num_hidden_layers, num_nodes:int, num_features: int, activation_fn) -> None:
         super(FeedForward, self).__init__()
         self.num_classes = 2
-        if num_hidden_layers == 1:
-             self.layers = nn.Sequential(
-                nn.Flatten(),
-                nn.Linear(num_features, num_nodes),
-                nn.ReLU(),
-                nn.Linear(num_nodes, 1),
-            )
-        else:
-            self.layers = nn.Sequential(
-                nn.Flatten(),
-                nn.Linear(num_features, num_nodes),
-                nn.ReLU(),
-                nn.Linear(num_nodes, num_nodes),
-                nn.ReLU(),
-                nn.Linear(num_nodes, 1),
-            )
+        self.activation = activation_fn
+
+        layers_list = [nn.Flatten(), nn.Linear(num_features, num_nodes)]
+        if num_hidden_layers > 1:
+            for i in range(num_hidden_layers):
+                layers_list.extend([self.activation(),nn.Linear(num_nodes, num_nodes)])
+
+        layers_list.extend([self.activation(), nn.Linear(num_nodes, 1)])
+        self.layers= nn.Sequential(*layers_list)
 
     def forward(self, xb):
         xb = xb.to(self.layers[1].weight.dtype)
@@ -112,7 +105,7 @@ class FeedForward(nn.Module):
             
             # create a stack where the top layer is the ground truth, bottom is prediction
             true_pred_stack = torch.stack((ground_truth_labels, all_predictions))
-            classifier_scores = precision_recall_fscore_support(ground_truth_labels, all_predictions)
+            classifier_scores = classification_report(ground_truth_labels, all_predictions)
             confusion_mtx = confusion_matrix(ground_truth_labels, all_predictions)
             class_accuracy = {i:0 for i in range(self.num_classes)} # dictionary containing class accuracies
             for label in range(self.num_classes):
@@ -130,4 +123,4 @@ class FeedForward(nn.Module):
             mean_accuracy = correct / len(tensor_dataset)
             
             return mean_accuracy, class_accuracy, classifier_scores, confusion_mtx
-                
+
