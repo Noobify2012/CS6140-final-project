@@ -23,6 +23,7 @@ numpy = "^1.24.3"
 scikit-learn = "^1.2.2"
 kaggle = "^1.5.13"
 tqdm = "^4.65.0"
+matplotlib = "^3.7.1"
 
 
 [tool.black]

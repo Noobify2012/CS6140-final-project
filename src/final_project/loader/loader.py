@@ -128,9 +128,14 @@ def _get_all_csv_files() -> List[Path]:
 
 
 def _get_df_from_csv(
-    *, year: int = None, file: str = None, all_files: bool = False
+    *,
+    year: int = None,
+    file: str = None,
+    all_files: bool = False,
+    drop_columns=drop_columns,
 ) -> pd.DataFrame:
     """return a pandas dataframe based on the provided stats"""
+
     if all(e is None for e in [file, year]) and not all_files:
         raise ValueError("You need at least one parameter dude")
     if file:
@@ -162,7 +167,11 @@ def _load_pickle(file: str) -> pd.DataFrame:
 
 
 def get_df(
-    *, year: int = None, file: str = None, all_files: bool = False
+    drop_columns=drop_columns,
+    *,
+    year: int = None,
+    file: str = None,
+    all_files: bool = False,
 ) -> pd.DataFrame:
     """Returns a Pandas DataFrame with data for a specific year and/or file.
 
@@ -171,7 +180,7 @@ def get_df(
     :type year: int, optional
     :param file: The name of the file to load data from. Defaults to None.
     :type file: str, optional
-    :param all_files: Whether to load data from all available files. 
+    :param all_files: Whether to load data from all available files.
                       Defaults to False.
     :type all_files: bool, optional
     :return: A Pandas DataFrame with the filtered data.
@@ -186,14 +195,14 @@ def get_df(
         if (res_dir / all_pickle_file).exists():
             return _load_pickle(res_dir / all_pickle_file)
         else:
-            df = _get_df_from_csv(all_files=True)
+            df = _get_df_from_csv(all_files=True, drop_columns=drop_columns)
             _save_df(all_pickle_file, df)
             return df
     elif year is not None:
         if (res_dir / f"df_{year}.pkl").exists():
             return _load_pickle(res_dir / f"df_{year}.pkl")
         else:
-            df = _get_df_from_csv(year=year)
+            df = _get_df_from_csv(year=year, drop_columns=drop_columns)
             _save_df(f"df_{year}.pkl", df)
             return df
     else:
@@ -211,10 +220,13 @@ def get_df(
             return _load_pickle(file_name)
         else:
             if num_part == "":
-                df = _get_df_from_csv(year=year_part)
+                df = _get_df_from_csv(
+                    year=year_part, drop_columns=drop_columns
+                )
             else:
                 df = _get_df_from_csv(
-                    file=f"Flights_{year_part}{num_part}.csv"
+                    file=f"Flights_{year_part}{num_part}.csv",
+                    drop_columns=drop_columns,
                 )
             _save_df(file_name, df)
             return df
