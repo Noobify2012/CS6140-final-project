@@ -121,7 +121,7 @@ def runEDA(df: pd.DataFrame) -> pd.DataFrame:
     #show the number of flights by destination
     destAnalysis(df, 20)
     # duplicated method for number of flights delayed
-    delay15Analysis(df)
+    # delay15Analysis(df)
     # show the plots of all the differnt delay types
     delayPlots(df)
     # show all of the delay types on a single boxplot
