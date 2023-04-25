@@ -61,7 +61,7 @@ drop_columns = [
     "Div5LongestGTime",
     "Div5WheelsOff",
     "Div5TailNum",
-    "Duplicate",
+    # "Duplicate",
     "Unnamed: 119",
 ]
 
@@ -141,7 +141,7 @@ def _get_df_from_csv(
     if file:
         file = _get_csv_by_name(file)
         df = pd.read_csv(file, low_memory=False)
-        return df.drop(columns=drop_columns)
+        df = df.drop(columns=drop_columns)
     else:
         df = pd.DataFrame()
         files = _get_all_csv_files() if all_files else _get_csv_by_year(year)
@@ -149,7 +149,7 @@ def _get_df_from_csv(
             temp_df = pd.read_csv(file, low_memory=False)
             temp_df = temp_df.drop(columns=drop_columns)
             df = pd.concat([df, temp_df], ignore_index=True)
-        return df
+    return df.rename(columns={"Operating_Airline ": "Operating_Airline"})
 
 
 def _save_df(name: str, df: pd.DataFrame) -> None:
