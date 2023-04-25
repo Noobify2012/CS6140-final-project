@@ -4,10 +4,10 @@ services:
     container_name: 'jupyter-lab'
     platform: "linux/amd64"
     build: 
-      dockerfile: ./Dockerfile-mamba
+      dockerfile: ./Dockerfile-poetry
       context: ./
     command: >
-      jupyter lab 
+      poetry run jupyter lab 
         --allow-root
         --ServerApp.allow_origin='*'
         --port=8889 
@@ -27,44 +27,44 @@ services:
       - '8889:8889'
     volumes:
       - type: bind
-        source: .
-        target: /app
+        source: ./exploration
+        target: /FINAL_PROJECT/exploration
 
-  flights-db:
-    container_name: 'flights-db'
-    platform: "linux/amd64"
-    build:
-      dockerfile: ./Dockerfile-postgres
-    restart: unless-stopped
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    networks:
-      - cs6140-network
-    ports:
-      - '5432:5432'
-    volumes:
-      - flights-db-volume:/var/lib/postgresql/data
+  # flights-db:
+  #   container_name: 'flights-db'
+  #   platform: "linux/amd64"
+  #   build:
+  #     dockerfile: ./Dockerfile-postgres
+  #   restart: unless-stopped
+  #   environment:
+  #     - POSTGRES_USER=postgres
+  #     - POSTGRES_PASSWORD=postgres
+  #   networks:
+  #     - cs6140-network
+  #   ports:
+  #     - '5432:5432'
+  #   volumes:
+  #     - flights-db-volume:/var/lib/postgresql/data
 
-  pgadmin:
-    image: dpage/pgadmin4
-    platform: "linux/amd64"
-    container_name: 'pgadmin'
-    restart: always
-    networks:
-      - cs6140-network
-    ports:
-      - "5050:80"
-    environment:
-      PGADMIN_DEFAULT_EMAIL : test@test.com
-      PGADMIN_DEFAULT_PASSWORD : test
-    volumes:
-      - pgadmin-volume:/var/lib/pgadmin
+  # pgadmin:
+  #   image: dpage/pgadmin4
+  #   platform: "linux/amd64"
+  #   container_name: 'pgadmin'
+  #   restart: always
+  #   networks:
+  #     - cs6140-network
+  #   ports:
+  #     - "5050:80"
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL : test@test.com
+  #     PGADMIN_DEFAULT_PASSWORD : test
+  #   volumes:
+  #     - pgadmin-volume:/var/lib/pgadmin
 
 
-volumes:
-  flights-db-volume:
-  pgadmin-volume:
+# volumes:
+#   flights-db-volume:
+#   pgadmin-volume:
 
 networks:
   cs6140-network:
