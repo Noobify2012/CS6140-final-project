@@ -147,4 +147,5 @@ dmypy.json
 .kaggle
 raw
 old_res
+res
 
