@@ -12,7 +12,7 @@ packages = [{include = "final_project", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "~3.10"
-black = "^23.3.0"
+black = {extras = ["jupyter"], version = "^23.3.0"}
 pandas = "^1.5.3"
 psycopg2-binary = "^2.9.5"
 python-dotenv = "^1.0.0"
