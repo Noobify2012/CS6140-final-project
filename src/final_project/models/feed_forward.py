@@ -43,7 +43,7 @@ class FeedForward(nn.Module):
         # TODO tune optimizer
         # opt = torch.optim.SGD(self.parameters(), lr=learning_rate, momentum=.9, weight_decay=.0000001) # create optimizer TODO weight decay
         # opt = torch.optim.SGD(self.parameters(), lr=learning_rate) # create optimizer TODO weight decay
-        opt = torch.optim.Adam(self.parameters(), lr=learning_rate)
+        opt = torch.optim.SGD(self.parameters(), lr=learning_rate)
         # store epoch losses
         training_losses = []
         validation_losses = []
@@ -55,8 +55,11 @@ class FeedForward(nn.Module):
 
             for xb, yb in train_dl:
                 # run model on batch and get loss
+                # predictions = torch.round(self(xb)).squeeze()
+                # loss = loss_function(predictions, yb.to(torch.float32))
                 predictions = self(xb).squeeze()
-                loss = loss_function(predictions, yb)
+                loss = loss_function(predictions, yb.to(torch.float32))
+    
                 # Back Propagation
                 loss.backward()  # compute gradient
                 opt.step()       # update weights
@@ -67,13 +70,17 @@ class FeedForward(nn.Module):
                 for xb_tr, yb_tr in train_dl:
                     # train loss
                     train_predictions = self(xb_tr).squeeze()
-                    training_loss = loss_function(train_predictions, yb_tr)
+                    # train_predictions = torch.round(self(xb_tr)).squeeze()
+                    training_loss = loss_function(train_predictions, yb_tr.to(torch.float32))
                     epoch_training_loss += (training_loss * xb_tr.shape[0])
+
                 for xb_val, yb_val in valid_dl:
                     # val loss
                     val_predictions = self(xb_val).squeeze()
-                    validation_loss = loss_function(val_predictions, yb_val) # get loss
+                    # val_predictions = torch.round(self(xb_val)).squeeze()
+                    validation_loss = loss_function(val_predictions, yb_val.to(torch.float32)) # get loss
                     epoch_validation_loss += (validation_loss * xb_val.shape[0])
+
                 # get epoch loss
                 num_train_samples = len(train_dataset)
                 epoch_training_loss_normalized = epoch_training_loss / num_train_samples 
@@ -95,12 +102,12 @@ class FeedForward(nn.Module):
             for xb, yb in tqdm(dataloader):
                 # run model on batch
                 class_probabilities = self(xb)
-                
+            
                 # choose most likely class for each sample
-                predictions = (class_probabilities > 0.5).long().squeeze()
-                
+                predictions = torch.round(torch.sigmoid(class_probabilities)).squeeze()
+
                 # create running tensor with all true_label, predicted_label pairs 
-                ground_truth_labels = torch.cat((ground_truth_labels, yb))
+                ground_truth_labels = torch.cat((ground_truth_labels, yb.to(torch.float32)))
                 all_predictions = torch.cat((all_predictions, predictions))
             
             # create a stack where the top layer is the ground truth, bottom is prediction
