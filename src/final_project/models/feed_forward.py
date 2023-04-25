@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader
 from torch.utils.data import TensorDataset
 
 class FeedForward(nn.Module):
-    def __init__(self, num_hidden_layers, num_nodes:int, num_features) -> None:
+    def __init__(self, num_hidden_layers, num_nodes:int, num_features: int) -> None:
         super(FeedForward, self).__init__()
         self.num_classes = 2
         if num_hidden_layers == 1:

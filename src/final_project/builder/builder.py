@@ -157,5 +157,5 @@ def encodeFrame(frame:pd.DataFrame):
     # test_frame_encoded.head(5)
 
 def columnManager(frame:pd.DataFrame):
-    frame = frame[['Year', 'Month', 'DayofMonth', 'Operating_Airline ', 'Origin', 'Dest', 'ArrDel15', 'DistanceGroup', 'CarrierDelay', 'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay', 'Duplicate']].copy()
+    frame = frame[['Year', 'Month', 'DayofMonth', 'Operating_Airline', 'Origin', 'Dest', 'ArrDel15', 'DistanceGroup', 'CarrierDelay', 'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay', 'Duplicate']].copy()
     return frame
