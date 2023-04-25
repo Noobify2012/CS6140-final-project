@@ -8,7 +8,7 @@ Summary:  A classification project using Logistic Regression, SVMs, and DNNs to 
 The project is running in a collection of docker images via `docker compose`.
 The `jupyter-lab` image runs a Debian instance with [Mamba] as the environment manager.
 
-## Running the Mamba Environment
+## Running the Poetry Environment
 
 > ### Prerequisites:
 > - Docker
@@ -22,18 +22,20 @@ Once done, you should have control over the terminal (as the `-d` is the detache
 
 If you run `docker ps`, you should have these running services:
 - jupyter-lab
-- flights-db
-- pgadmin
+<!-- - flights-db
+- pgadmin -->
 
-You should also see two new volumes with `docker volumes ls`:
+<!-- You should also see two new volumes with `docker volumes ls`:
 - cs6140-final-project_flights-db-volume
-- cs6140-final-project_pgadmin-db-volume
+- cs6140-final-project_pgadmin-db-volume -->
 
 And a new network with `docker network ls`:
 - cs6140-final-project_cs6140-network
 
-
-## Updating Mamba 
+## Updating Poetry
+If you need to add libraries 
+TODO (dan) - FILL IN
+<!-- ## Updating Mamba 
 If you need to add libraries to the `jupyter-lab` service, it's easiest to do from inside the service:
 
 1. Run `docker exec -it jupyter-lab /bin/bash` to get CLI access.
@@ -42,12 +44,12 @@ If you need to add libraries to the `jupyter-lab` service, it's easiest to do fr
     > *note:* sometimes library names are different between *pip* and *conda-forge*, so its best to do a google search for the library with the term 'conda-forge' added for the name of the library if you can't find it.
 1. Once installed, run `mamba env export > environment.yml` to "update" the environment file.
 
-This update will persist during `docker compose up/down` operations but the `environment.yml` file will need to be updated in git.
+This update will persist during `docker compose up/down` operations but the `environment.yml` file will need to be updated in git. -->
 
-### Pulling a Mamba Update
+<!-- ### Pulling a Mamba Update
 
 If you're pulling a branch with an environment change, you want to force your image to rebuild.
-Run `docker compose up -d --force-recreate --build jupyter-lab`
+Run `docker compose up -d --force-recreate --build jupyter-lab` -->
 
 ## Updating the PostgreSQL Image
 <!-- TODO (dan) UNDER CONSTRUCTION -->
@@ -104,6 +106,7 @@ Open up http://localhost:8889
 
 <!-- Links -->
 [VSCode]: https://code.visualstudio.com/download
+[Poetry]: https://python-poetry.org/docs/
 [Mamba]: https://mamba.readthedocs.io/en/latest/index.html
 [DataSpell]: https://www.jetbrains.com/dataspell/
 
