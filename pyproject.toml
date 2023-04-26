@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cs6141-final-project"
-version = "0.1.0"
+version = "0.1.2"
 description = "To infinity, and beyond!"
 authors = [
     "Daniel Blum <blum.da@northeastern.edu>",
@@ -11,22 +11,18 @@ readme = "README.md"
 packages = [{include = "final_project", from = "src"}]
 
 [tool.poetry.dependencies]
-python = "~3.11"
+python = "^3.9"
 black = {extras = ["jupyter"], version = "^23.3.0"}
 pandas = "^1.5.3"
-psycopg2-binary = "^2.9.5"
-python-dotenv = "^1.0.0"
-sqlalchemy = "^2.0.7"
 pyyaml = "^6.0"
 jupyterlab = "^3.6.3"
-numpy = "^1.24.3"
-scikit-learn = "^1.2.2"
-kaggle = "^1.5.13"
 tqdm = "^4.65.0"
 matplotlib = "^3.7.1"
 torch = "^2.0.0"
 tabulate = "^0.9.0"
 seaborn = "^0.12.2"
+numpy = "==1.23.5"
+scikit-learn = "^1.2.2"
 
 
 [tool.black]
