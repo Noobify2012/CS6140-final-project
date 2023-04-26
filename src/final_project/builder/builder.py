@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.preprocessing import OneHotEncoder
 
+
 def cyclical_encode_dmy(df: pd.DataFrame) -> pd.DataFrame:
     df["date_sin"] = np.sin(2 * np.pi * df["DayofMonth"] / 31)
     df["date_cos"] = np.cos(2 * np.pi * df["DayofMonth"] / 31)
@@ -31,86 +32,135 @@ def one_hot_encoding(
 
 
 def airlineAnalysis(frame: pd.DataFrame):
-    frame['Operating_Airline'].value_counts().plot.barh(x='Number of Flights', y='Airline', rot=0)
-    plt.show();
+    frame["Operating_Airline"].value_counts().plot.barh(
+        x="Number of Flights", y="Airline", rot=0
+    )
+    plt.show()
 
 
-def originAnalysis(frame: pd.DataFrame, num : int):
-    frame['Origin'].value_counts().iloc[:num].plot.barh(x='Number of Flights', y='Origin', rot=0)
-    plt.show();
+def originAnalysis(frame: pd.DataFrame, num: int):
+    frame["Origin"].value_counts().iloc[:num].plot.barh(
+        x="Number of Flights", y="Origin", rot=0
+    )
+    plt.show()
 
 
-
-def destAnalysis(frame: pd.DataFrame, num : int):
-    frame['Dest'].value_counts().iloc[:num].plot.barh(x='Number of Flights', y='Destination', rot=0)
-    plt.show();
+def destAnalysis(frame: pd.DataFrame, num: int):
+    frame["Dest"].value_counts().iloc[:num].plot.barh(
+        x="Number of Flights", y="Destination", rot=0
+    )
+    plt.show()
 
 
 def delay15Analysis(frame: pd.DataFrame):
-    frame['ArrDel15'].value_counts().plot.barh(x='Number of Flights', y='Delayed', rot=0)
-    plt.show();
+    frame["ArrDel15"].value_counts().plot.barh(
+        x="Number of Flights", y="Delayed", rot=0
+    )
+    plt.show()
 
 
 def delayAnalysis(frame: pd.DataFrame):
     #
-    frame['ArrDel15'].value_counts().plot.barh(x='Number of Flights', y='Delayed', rot=0)
-    plt.show();
+    frame["ArrDel15"].value_counts().plot.barh(
+        x="Number of Flights", y="Delayed", rot=0
+    )
+    plt.show()
 
 
 def delayPlots(frame: pd.DataFrame):
     # filter out no delay data 0 min or less
-    carrierFrame = frame.query('CarrierDelay > 0.0')
-    weatherFrame = frame.query('WeatherDelay > 0.0')
-    nasFrame = frame.query('NASDelay > 0.0')
-    securityFrame = frame.query('SecurityDelay > 0.0')
-    laFrame = frame.query('LateAircraftDelay > 0.0')
+    carrierFrame = frame.query("CarrierDelay > 0.0")
+    weatherFrame = frame.query("WeatherDelay > 0.0")
+    nasFrame = frame.query("NASDelay > 0.0")
+    securityFrame = frame.query("SecurityDelay > 0.0")
+    laFrame = frame.query("LateAircraftDelay > 0.0")
     # frame = frame.query('CarrierDelay > 0.0 | WeatherDelay > 0.0 | NASDelay > 0.0 | SecurityDelay > 0.0 | LateAircraftDelay > 0.0')
-    carrierFrame['CarrierDelay'].value_counts().iloc[:20].plot.barh(x="Count", y="Delay Time")
-    weatherFrame['WeatherDelay'].value_counts().iloc[:20].plot.barh(x="Count", y="Delay Time")
-    nasFrame['NASDelay'].value_counts().iloc[:20].plot.barh(x="Count", y="Delay Time")
-    securityFrame['SecurityDelay'].value_counts().iloc[:20].plot.barh(x="Count", y="Delay Time")
-    laFrame['LateAircraftDelay'].value_counts().iloc[:20].plot.barh(x="Count", y="Delay Time")
+    carrierFrame["CarrierDelay"].value_counts().iloc[:20].plot.barh(
+        x="Count", y="Delay Time"
+    )
+    weatherFrame["WeatherDelay"].value_counts().iloc[:20].plot.barh(
+        x="Count", y="Delay Time"
+    )
+    nasFrame["NASDelay"].value_counts().iloc[:20].plot.barh(
+        x="Count", y="Delay Time"
+    )
+    securityFrame["SecurityDelay"].value_counts().iloc[:20].plot.barh(
+        x="Count", y="Delay Time"
+    )
+    laFrame["LateAircraftDelay"].value_counts().iloc[:20].plot.barh(
+        x="Count", y="Delay Time"
+    )
     # frame['CarrierDelay', 'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay'].value_counts().plot.barh()
-    plt.show();
+    plt.show()
 
 
 def boxplotData(frame: pd.DataFrame):
     # df = pd.melt(frame['CarrierDelay', 'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay'])
-    boxplot = frame.boxplot(column=['CarrierDelay', 'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay'], rot=45)
+    boxplot = frame.boxplot(
+        column=[
+            "CarrierDelay",
+            "WeatherDelay",
+            "NASDelay",
+            "SecurityDelay",
+            "LateAircraftDelay",
+        ],
+        rot=45,
+    )
     plt.show()
 
 
 def delayCounts(frame: pd.DataFrame):
-    mean_carrier_delay = frame['CarrierDelay'].mean()
-    mean_weather_delay = frame['WeatherDelay'].mean()
-    mean_nas_delay = frame['NASDelay'].mean()
-    mean_security_delay = frame['SecurityDelay'].mean()
-    mean_la_delay = frame['LateAircraftDelay'].mean()
-    print("Mean Carrier Delay: " + str(mean_carrier_delay) + "\nMean Weather Delay: " + str(mean_weather_delay) + "\nMean National Airspace Delay: " + str(mean_nas_delay) + "\nMean Security Delay: " + str(mean_security_delay) + "\nMean Late Aircraft Delay: " + str(mean_la_delay))
-    median_carrier_delay = frame['CarrierDelay'].median()
-    median_weather_delay = frame['WeatherDelay'].median()
-    median_nas_delay = frame['NASDelay'].median()
-    median_security_delay = frame['SecurityDelay'].median()
-    median_la_delay = frame['LateAircraftDelay'].median()
-    print("Median Carrier Delay: " + str(median_carrier_delay) + "\nMedian Weather Delay: " + str(median_weather_delay) + "\nMedian National Airspace Delay: " + str(median_nas_delay) + "\nMedian Security Delay: " + str(median_security_delay) + "\nMedian Late Aircraft Delay: " + str(median_la_delay))
-
+    mean_carrier_delay = frame["CarrierDelay"].mean()
+    mean_weather_delay = frame["WeatherDelay"].mean()
+    mean_nas_delay = frame["NASDelay"].mean()
+    mean_security_delay = frame["SecurityDelay"].mean()
+    mean_la_delay = frame["LateAircraftDelay"].mean()
+    print(
+        "Mean Carrier Delay: "
+        + str(mean_carrier_delay)
+        + "\nMean Weather Delay: "
+        + str(mean_weather_delay)
+        + "\nMean National Airspace Delay: "
+        + str(mean_nas_delay)
+        + "\nMean Security Delay: "
+        + str(mean_security_delay)
+        + "\nMean Late Aircraft Delay: "
+        + str(mean_la_delay)
+    )
+    median_carrier_delay = frame["CarrierDelay"].median()
+    median_weather_delay = frame["WeatherDelay"].median()
+    median_nas_delay = frame["NASDelay"].median()
+    median_security_delay = frame["SecurityDelay"].median()
+    median_la_delay = frame["LateAircraftDelay"].median()
+    print(
+        "Median Carrier Delay: "
+        + str(median_carrier_delay)
+        + "\nMedian Weather Delay: "
+        + str(median_weather_delay)
+        + "\nMedian National Airspace Delay: "
+        + str(median_nas_delay)
+        + "\nMedian Security Delay: "
+        + str(median_security_delay)
+        + "\nMedian Late Aircraft Delay: "
+        + str(median_la_delay)
+    )
 
 
 def DistanceAnalysis(frame: pd.DataFrame, num: int):
-    frame['DistanceGroup'].value_counts().iloc[:num].plot.barh(x='Number of Flights', y='Origin', rot=0)
-    plt.show();
-
+    frame["DistanceGroup"].value_counts().iloc[:num].plot.barh(
+        x="Number of Flights", y="Origin", rot=0
+    )
+    plt.show()
 
 
 def delayPercentage(frame: pd.DataFrame):
-    delayed = frame['ArrDel15'].value_counts()[1.0]
-    notDel = frame['ArrDel15'].value_counts()[0.0]
+    delayed = frame["ArrDel15"].value_counts()[1.0]
+    notDel = frame["ArrDel15"].value_counts()[0.0]
     total = delayed + notDel
-    percentage = (delayed/notDel) * 100
+    percentage = (delayed / notDel) * 100
     # print('value of delayed: ' + str(delayed))
     # print('value of total: ' + str(total))
-    print('Percentage of flights delayed: ' + str(percentage))
-
+    print("Percentage of flights delayed: " + str(percentage))
 
 
 def runEDA(df: pd.DataFrame) -> pd.DataFrame:
@@ -118,7 +168,7 @@ def runEDA(df: pd.DataFrame) -> pd.DataFrame:
     airlineAnalysis(df)
     # Show the number of flights by origin
     originAnalysis(df, 20)
-    #show the number of flights by destination
+    # show the number of flights by destination
     destAnalysis(df, 20)
     # duplicated method for number of flights delayed
     # delay15Analysis(df)
@@ -133,29 +183,48 @@ def runEDA(df: pd.DataFrame) -> pd.DataFrame:
     # Calculate percentage of flights that are delayed
     delayPercentage(df)
 
+
 # one hot encode origin and destination
 def oneHotEncoding(df, columnName, prefixName):
     enc = pd.get_dummies(df, columns=columnName, prefix=prefixName)
     return enc
 
-def encodeFrame(frame:pd.DataFrame):
-#Cyclically encode the day, month, and year
+
+def encodeFrame(frame: pd.DataFrame):
+    # Cyclically encode the day, month, and year
     frame = cyclical_encode_dmy(frame)
     # test_frame_encoded.head(5)
-    #encode the operating airline, origin, and destination codes
-    catsToEncode = ['Operating_Airline', 'Origin', 'Dest']
+    # encode the operating airline, origin, and destination codes
+    catsToEncode = ["Operating_Airline", "Origin", "Dest"]
     for cat in catsToEncode:
         frame = oneHotEncoding(frame, [cat], cat)
-    
 
-    #Drop the duplicate category
-    frame.drop(['Duplicate'], axis=1, inplace=True)
-    #fill the delay type NANs
+    # Drop the duplicate category
+    frame.drop(["Duplicate"], axis=1, inplace=True)
+    # fill the delay type NANs
     frame = frame.fillna(0)
-    print(frame.head(5))
+    # print(frame.head(5))
     return frame
     # test_frame_encoded.head(5)
 
-def columnManager(frame:pd.DataFrame):
-    frame = frame[['Year', 'Month', 'DayofMonth', 'Operating_Airline ', 'Origin', 'Dest', 'ArrDel15', 'DistanceGroup', 'CarrierDelay', 'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay', 'Duplicate']].copy()
+
+def columnManager(frame: pd.DataFrame):
+    frame = frame[
+        [
+            "Year",
+            "Month",
+            "DayofMonth",
+            "Operating_Airline",
+            "Origin",
+            "Dest",
+            "ArrDel15",
+            "DistanceGroup",
+            "CarrierDelay",
+            "WeatherDelay",
+            "NASDelay",
+            "SecurityDelay",
+            "LateAircraftDelay",
+            "Duplicate",
+        ]
+    ].copy()
     return frame
