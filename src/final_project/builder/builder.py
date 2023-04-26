@@ -235,6 +235,7 @@ def columnManager(frame):
     # frame2 = frame[['DayofMonth',  'Origin', 'Operating_Airline','ArrDel15', 'DistanceGroup', 'CarrierDelay', 'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay', 'Duplicate']].copy()
     frame = frame[['Year', 'Month', 'DayofMonth', 'Operating_Airline', 'Origin', 'Dest', 'ArrDel15', 'DistanceGroup', 'CarrierDelay', 'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay', 'Duplicate']].copy()
 
+
     return frame
 
 
