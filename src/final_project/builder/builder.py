@@ -10,13 +10,28 @@ from sklearn.preprocessing import OneHotEncoder
 
 
 def cyclical_encode_dmy(df: pd.DataFrame) -> pd.DataFrame:
-    df["date_sin"] = np.sin(2 * np.pi * df["DayofMonth"] / 31)
-    df["date_cos"] = np.cos(2 * np.pi * df["DayofMonth"] / 31)
-    df["month_sin"] = np.sin(2 * np.pi * df["Month"] / 12)
-    df["month_cos"] = np.cos(2 * np.pi * df["Month"] / 12)
-    df["year_sin"] = np.sin(2 * np.pi * df["Year"] / 100)
-    df["year_cos"] = np.cos(2 * np.pi * df["Year"] / 100)
-    return df.drop(["DayofMonth", "Month", "Year"], axis=1)
+    cycleCats = ['DayofMonth', 'Month', 'Year']
+    catsToCycleEncode = []
+    for cat in cycleCats:
+        pass
+        if cat in df.columns:
+            catsToCycleEncode.append(cat)
+    if ('DayofMonth' in catsToCycleEncode):
+        df['date_sin'] = np.sin(2 * np.pi * df['DayofMonth'] / 31)
+        df['date_cos'] = np.cos(2 * np.pi * df['DayofMonth'] / 31)
+    if ("Month" in catsToCycleEncode):
+        df["month_sin"] = np.sin(2 * np.pi * df["Month"] / 12)
+        df["month_cos"] = np.cos(2 * np.pi * df["Month"] / 12)
+    if ('Year' in catsToCycleEncode):
+        df['year_sin'] = np.sin(2 * np.pi * df['Year'] / 100)
+        df['year_cos'] = np.cos(2 * np.pi * df['Year'] / 100)
+        print("length of vars to be dropped: " + str(len(catsToCycleEncode)))
+    # return df
+    if len(catsToCycleEncode) == 0:
+        return df
+    else:
+        return df.drop(columns=catsToCycleEncode, axis=1)
+
 
 
 def one_hot_encoding(
@@ -185,7 +200,7 @@ def runEDA(df: pd.DataFrame) -> pd.DataFrame:
 
 
 # one hot encode origin and destination
-def oneHotEncoding(df, columnName, prefixName):
+def oneHotEncoding(df:pd.DataFrame, columnName:list, prefixName:str):
     enc = pd.get_dummies(df, columns=columnName, prefix=prefixName)
     return enc
 
@@ -194,37 +209,33 @@ def encodeFrame(frame: pd.DataFrame):
     # Cyclically encode the day, month, and year
     frame = cyclical_encode_dmy(frame)
     # test_frame_encoded.head(5)
-    # encode the operating airline, origin, and destination codes
-    catsToEncode = ["Operating_Airline", "Origin", "Dest"]
-    for cat in catsToEncode:
+    #encode the operating airline, origin, and destination codes
+    hotencodedCats = ['Operating_Airline', 'Origin', 'Dest']
+    hotcatsToEncode = []
+    
+    #see what frames to encode
+    for cats in hotencodedCats:
+        if cats in frame.columns:
+            hotcatsToEncode.append(cats)
+    
+    for cat in hotcatsToEncode:
         frame = oneHotEncoding(frame, [cat], cat)
+    
 
-    # Drop the duplicate category
-    frame.drop(["Duplicate"], axis=1, inplace=True)
-    # fill the delay type NANs
+    #Drop the duplicate category
+    print(frame.columns)
+    frame.drop(['Duplicate'], axis=1, inplace=True)
+    #fill the delay type NANs
     frame = frame.fillna(0)
     # print(frame.head(5))
     return frame
     # test_frame_encoded.head(5)
 
+def columnManager(frame):
+    # frame2 = frame[['DayofMonth',  'Origin', 'Operating_Airline','ArrDel15', 'DistanceGroup', 'CarrierDelay', 'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay', 'Duplicate']].copy()
+    frame = frame[['Year', 'Month', 'DayofMonth', 'Operating_Airline', 'Origin', 'Dest', 'ArrDel15', 'DistanceGroup', 'CarrierDelay', 'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay', 'Duplicate']].copy()
 
-def columnManager(frame: pd.DataFrame):
-    frame = frame[
-        [
-            "Year",
-            "Month",
-            "DayofMonth",
-            "Operating_Airline",
-            "Origin",
-            "Dest",
-            "ArrDel15",
-            "DistanceGroup",
-            "CarrierDelay",
-            "WeatherDelay",
-            "NASDelay",
-            "SecurityDelay",
-            "LateAircraftDelay",
-            "Duplicate",
-        ]
-    ].copy()
     return frame
+
+
+
