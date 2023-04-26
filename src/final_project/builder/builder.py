@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.preprocessing import OneHotEncoder
 
+
 def cyclical_encode_dmy(df: pd.DataFrame) -> pd.DataFrame:
     cycleCats = ['DayofMonth', 'Month', 'Year']
     catsToCycleEncode = []
@@ -178,12 +179,14 @@ def DistanceAnalysis(frame: pd.DataFrame, num: int, resDir:str):
 def delayPercentage(frame: pd.DataFrame, resDir:str):
     delayed = frame['ArrDel15'].value_counts()[1.0]
     notDel = frame['ArrDel15'].value_counts()[0.0]
+def delayPercentage(frame: pd.DataFrame):
+    delayed = frame["ArrDel15"].value_counts()[1.0]
+    notDel = frame["ArrDel15"].value_counts()[0.0]
     total = delayed + notDel
-    percentage = (delayed/notDel) * 100
+    percentage = (delayed / notDel) * 100
     # print('value of delayed: ' + str(delayed))
     # print('value of total: ' + str(total))
-    print('Percentage of flights delayed: ' + str(percentage))
-
+    print("Percentage of flights delayed: " + str(percentage))
 
 
 def runEDA(df: pd.DataFrame, resDir:str) -> pd.DataFrame:
@@ -206,13 +209,15 @@ def runEDA(df: pd.DataFrame, resDir:str) -> pd.DataFrame:
     # Calculate percentage of flights that are delayed
     delayPercentage(df, resDir)
 
+
 # one hot encode origin and destination
 def oneHotEncoding(df:pd.DataFrame, columnName:list, prefixName:str):
     enc = pd.get_dummies(df, columns=columnName, prefix=prefixName)
     return enc
 
-def encodeFrame(frame:pd.DataFrame):
-#Cyclically encode the day, month, and year
+
+def encodeFrame(frame: pd.DataFrame):
+    # Cyclically encode the day, month, and year
     frame = cyclical_encode_dmy(frame)
     # test_frame_encoded.head(5)
     #encode the operating airline, origin, and destination codes
