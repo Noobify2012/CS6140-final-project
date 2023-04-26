@@ -28,9 +28,9 @@ class ModelENUM(Enum):
 
 def get_pipeline(model_type: ModelENUM) -> Pipeline:
     """Returns a pipeline appropriate for the given model"""
-    if model_type == ModelENUM.SVM:
+    if model_type is ModelENUM.SVM:
         steps = [("scaler", StandardScaler()), ("svm", SVC())]
-    elif model_type == ModelENUM.LR:
+    elif model_type is ModelENUM.LR:
         steps = [("lr", LogisticRegression())]
     else:
         raise ValueError(
@@ -93,13 +93,13 @@ def get_best_params(
 ) -> Dict[str, Any]:
     """Get a dictionary of the best performing  parameters for the model"""
     params = model.best_estimator_.get_params()
-    if model_type == ModelENUM.LR:
+    if model_type is ModelENUM.LR:
         return {
             "solver": params["lr__solver"],
             "penalty": params["lr__penalty"],
             "C": params["lr__C"],
         }
-    elif model_type == ModelENUM.SVM:
+    elif model_type is ModelENUM.SVM:
         return {
             "gamma": params["svm__gamma"],
             "kernel": params["svm__kernel"],
@@ -117,7 +117,10 @@ def save_model(model_type: ModelENUM, model: GridSearchCV) -> None:
     best_params = get_best_params(model_type, model)
     file_string = f"{model_type.title}"
     for k, v in best_params.items():
-        file_string += "_" + v
+        if k == "C":
+            file_string += "_" + f"C{v}"
+        else:
+            file_string += "_" + f"{v}"
     file_string += ".pkl"
     joblib.dump(best_estimator, model_dir / file_string)
 
