@@ -46,52 +46,103 @@ def one_hot_encoding(
 
 
 def airlineAnalysis(frame: pd.DataFrame):
-    frame['Operating_Airline'].value_counts().plot.barh(x='Number of Flights', y='Airline', rot=0)
-    plt.show();
+    # fig, ax = plt.subplots()
+    # ax.barh(frame['Operating_Airline'].value_counts(), align='center')
+    # ax.set_xlabel('Count')
+    # ax.set_ylabel('Airline')
+    # # frame['Operating_Airline'].value_counts().plot.barh(x='Number of Flights', y='Airline', rot=0)
+    # plt.legend()
+    # plt.title('Flights per Airline')
+    
+    airline_counts = frame['Operating_Airline'].value_counts()
+    fig, ax = plt.subplots()
+    ax.barh(airline_counts.index, airline_counts.values, align='center')
+    ax.set_xlabel('Count')
+    ax.set_ylabel('Airline')
+    ax.set_title('Number of Flights by Airline')
+    plt.show()
 
 
 def originAnalysis(frame: pd.DataFrame, num : int):
-    frame['Origin'].value_counts().iloc[:num].plot.barh(x='Number of Flights', y='Origin', rot=0)
-    plt.show();
+    # frame['Origin'].value_counts().iloc[:num].plot.barh(x='Number of Flights', y='Origin', rot=0)
+    airline_counts = frame['Origin'].value_counts().iloc[:num]
+    fig, ax = plt.subplots()
+    ax.barh(airline_counts.index, airline_counts.values, align='center')
+    ax.set_xlabel('Count')
+    ax.set_ylabel('Origin')
+    ax.set_title('Number of Flights by Origin')
+    plt.show()
 
 
 
 def destAnalysis(frame: pd.DataFrame, num : int):
-    frame['Dest'].value_counts().iloc[:num].plot.barh(x='Number of Flights', y='Destination', rot=0)
-    plt.show();
+    # frame['Dest'].value_counts().iloc[:num].plot.barh(x='Number of Flights', y='Destination', rot=0)
+    airline_counts = frame['Dest'].value_counts().iloc[:num]
+    fig, ax = plt.subplots()
+    ax.barh(airline_counts.index, airline_counts.values, align='center')
+    ax.set_xlabel('Count')
+    ax.set_ylabel('Destination')
+    ax.set_title('Number of Flights by Destination')
+    plt.show()
 
 
 def delay15Analysis(frame: pd.DataFrame):
     frame['ArrDel15'].value_counts().plot.barh(x='Number of Flights', y='Delayed', rot=0)
-    plt.show();
+    airline_counts = frame['ArrDel15'].value_counts()
+    fig, ax = plt.subplots()
+    ax.barh(airline_counts.index, airline_counts.values, align='center')
+    ax.set_xlabel('Number of Flights')
+    ax.set_ylabel('Delayed')
+    ax.set_title('Number of Flights Delayed ')
+    plt.show()
 
 
-def delayAnalysis(frame: pd.DataFrame):
-    #
-    frame['ArrDel15'].value_counts().plot.barh(x='Number of Flights', y='Delayed', rot=0)
-    plt.show();
+# def delayAnalysis(frame: pd.DataFrame):
+#     #
+#     frame['ArrDel15'].value_counts().plot.barh(x='Number of Flights', y='Delayed', rot=0)
+#     plt.show();
 
 
 def delayPlots(frame: pd.DataFrame):
-    # filter out no delay data 0 min or less
-    carrierFrame = frame.query('CarrierDelay > 0.0')
-    weatherFrame = frame.query('WeatherDelay > 0.0')
-    nasFrame = frame.query('NASDelay > 0.0')
-    securityFrame = frame.query('SecurityDelay > 0.0')
-    laFrame = frame.query('LateAircraftDelay > 0.0')
-    # frame = frame.query('CarrierDelay > 0.0 | WeatherDelay > 0.0 | NASDelay > 0.0 | SecurityDelay > 0.0 | LateAircraftDelay > 0.0')
-    carrierFrame['CarrierDelay'].value_counts().iloc[:20].plot.barh(x="Count", y="Delay Time")
-    weatherFrame['WeatherDelay'].value_counts().iloc[:20].plot.barh(x="Count", y="Delay Time")
-    nasFrame['NASDelay'].value_counts().iloc[:20].plot.barh(x="Count", y="Delay Time")
-    securityFrame['SecurityDelay'].value_counts().iloc[:20].plot.barh(x="Count", y="Delay Time")
-    laFrame['LateAircraftDelay'].value_counts().iloc[:20].plot.barh(x="Count", y="Delay Time")
-    # frame['CarrierDelay', 'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay'].value_counts().plot.barh()
-    plt.show();
+    delayList = ['CarrierDelay', 'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay']
+    for delay in delayList:
+        delayString = delay + ' > 0.0'
+        delayFrame = frame.query(delayString)
+        airline_counts = delayFrame[delay].value_counts().iloc[:20]
+        fig, ax = plt.subplots()
+        ax.barh(airline_counts.index, airline_counts.values, align='center')
+        ax.set_xlabel('Count of Occurances')
+        ax.set_ylabel('Delay Time')
+        ax.set_title('Top 20 Occurances of Delays from ' + str(delay))
+        plt.show()
+    
+    # # filter out no delay data 0 min or less
+    # carrierFrame = frame.query('CarrierDelay > 0.0')
+    # weatherFrame = frame.query('WeatherDelay > 0.0')
+    # nasFrame = frame.query('NASDelay > 0.0')
+    # securityFrame = frame.query('SecurityDelay > 0.0')
+    # laFrame = frame.query('LateAircraftDelay > 0.0')
+    # # frame = frame.query('CarrierDelay > 0.0 | WeatherDelay > 0.0 | NASDelay > 0.0 | SecurityDelay > 0.0 | LateAircraftDelay > 0.0')
+    # carrierFrame['CarrierDelay'].value_counts().iloc[:20].plot.barh(x="Count", y="Delay Time")
+    # weatherFrame['WeatherDelay'].value_counts().iloc[:20].plot.barh(x="Count", y="Delay Time")
+    # nasFrame['NASDelay'].value_counts().iloc[:20].plot.barh(x="Count", y="Delay Time")
+    # securityFrame['SecurityDelay'].value_counts().iloc[:20].plot.barh(x="Count", y="Delay Time")
+    # laFrame['LateAircraftDelay'].value_counts().iloc[:20].plot.barh(x="Count", y="Delay Time")
+    # # frame['CarrierDelay', 'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay'].value_counts().plot.barh()
+    # plt.show();
 
 
 def boxplotData(frame: pd.DataFrame):
     # df = pd.melt(frame['CarrierDelay', 'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay'])
     boxplot = frame.boxplot(column=['CarrierDelay', 'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay'], rot=45)
+    plt.title("Delays by Type, Time and Occurance")
+    plt.ylabel("Time in Minutes")
+    
+    # boxplot_data = [frame['CarrierDelay'], frame['WeatherDelay'], frame['NASDelay'], frame['SecurityDelay'], frame['LateAircraftDelay']]
+    # fig, ax = plt.subplots()
+    # ax.boxplot(boxplot_data)
+    # ax.set_xticklabels(['CarrierDelay', 'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay'], rotation=45)
+
     plt.show()
 
 
@@ -112,8 +163,14 @@ def delayCounts(frame: pd.DataFrame):
 
 
 def DistanceAnalysis(frame: pd.DataFrame, num: int):
-    frame['DistanceGroup'].value_counts().iloc[:num].plot.barh(x='Number of Flights', y='Origin', rot=0)
-    plt.show();
+    # frame['DistanceGroup'].value_counts().iloc[:num].plot.barh(x='Number of Flights', y='Origin', rot=0)
+    airline_counts = frame['DistanceGroup'].value_counts().iloc[:num]
+    fig, ax = plt.subplots()
+    ax.barh(airline_counts.index, airline_counts.values, align='center')
+    ax.set_xlabel('Count')
+    ax.set_ylabel('Distance Group')
+    ax.set_title('Number of Flights by Distance Group')
+    plt.show()
 
 
 
@@ -136,7 +193,7 @@ def runEDA(df: pd.DataFrame) -> pd.DataFrame:
     #show the number of flights by destination
     destAnalysis(df, 20)
     # duplicated method for number of flights delayed
-    # delay15Analysis(df)
+    delay15Analysis(df)
     # show the plots of all the differnt delay types
     delayPlots(df)
     # show all of the delay types on a single boxplot
