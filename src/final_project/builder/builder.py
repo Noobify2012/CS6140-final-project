@@ -25,7 +25,7 @@ def cyclical_encode_dmy(df: pd.DataFrame) -> pd.DataFrame:
     if ('Year' in catsToCycleEncode):
         df['year_sin'] = np.sin(2 * np.pi * df['Year'] / 100)
         df['year_cos'] = np.cos(2 * np.pi * df['Year'] / 100)
-        print("length of vars to be dropped: " + str(len(catsToCycleEncode)))
+        # print("length of vars to be dropped: " + str(len(catsToCycleEncode)))
     # return df
     if len(catsToCycleEncode) == 0:
         return df
@@ -234,7 +234,7 @@ def encodeFrame(frame: pd.DataFrame):
     
 
     #Drop the duplicate category
-    print(frame.columns)
+    # print(frame.columns)
     frame.drop(['Duplicate'], axis=1, inplace=True)
     #fill the delay type NANs
     frame = frame.fillna(0)

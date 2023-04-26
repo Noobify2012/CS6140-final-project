@@ -3,10 +3,11 @@ import joblib
 from enum import Enum
 from pathlib import Path
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import f1_score, precision_recall_fscore_support
+from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
-from sklearn.model_selection import GridSearchCV
 from typing import Any, Dict, List
 
 model_dir = Path.cwd().parent / "models"
@@ -124,3 +125,16 @@ def save_model(model_type: ModelENUM, model: GridSearchCV) -> None:
     file_string += ".pkl"
     joblib.dump(best_estimator, model_dir / file_string)
 
+def analyze_model(model, x_test, x_train, y_test, y_train):
+    test_accuracy = model.score(x_test, y_test)
+    train_accuracy = model.score(x_train, y_train)
+    y_pred = model.predict(x_test)
+    f1 = f1_score(y_test, y_pred)
+    prf = precision_recall_fscore_support(y_test, y_pred, average='binary') # TODO different average values: micro macro binary weighted samples
+
+    print(f"Test accuracy: {test_accuracy}")
+    print(f"Train accuracy: {train_accuracy}")
+    print(f"Precision: {prf[0]}")
+    print(f"Recall: {prf[1]}")
+    print(f"F-Beta Score: {prf[2]}")
+    print(f"F1 Score: {f1}")
