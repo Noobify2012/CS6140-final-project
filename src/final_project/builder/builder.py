@@ -62,7 +62,7 @@ def airlineAnalysis(frame: pd.DataFrame, resDir:str):
     ax.set_ylabel('Airline')
     ax.set_title('Number of Flights by Airline')
     # plt.show()
-    plt.savefig("../res/" + resDir +"_airlineAnalysis.jpg")
+    plt.savefig("../img/" + resDir +"_airlineAnalysis.jpg")
 
 
 def originAnalysis(frame: pd.DataFrame, num : int, resDir:str):
@@ -73,7 +73,7 @@ def originAnalysis(frame: pd.DataFrame, num : int, resDir:str):
     ax.set_xlabel('Count')
     ax.set_ylabel('Origin')
     ax.set_title('Number of Flights by Origin')
-    plt.savefig("../res/" + resDir +"_originAnalysis.jpg")
+    plt.savefig("../img/" + resDir +"_originAnalysis.jpg")
 
 
 
@@ -85,7 +85,7 @@ def destAnalysis(frame: pd.DataFrame, num : int, resDir:str):
     ax.set_xlabel('Count')
     ax.set_ylabel('Destination')
     ax.set_title('Number of Flights by Destination')
-    plt.savefig("../res/" + resDir +"_destAnalysis.jpg")
+    plt.savefig("../img/" + resDir +"_destAnalysis.jpg")
 
 
 def delay15Analysis(frame: pd.DataFrame, resDir:str):
@@ -96,7 +96,7 @@ def delay15Analysis(frame: pd.DataFrame, resDir:str):
     ax.set_xlabel('Number of Flights')
     ax.set_ylabel('Delayed')
     ax.set_title('Number of Flights Delayed ')
-    plt.savefig("../res/" + resDir +"_delay15Analysis.jpg")
+    plt.savefig("../img/" + resDir +"_delay15Analysis.jpg")
 
 
 # def delayAnalysis(frame: pd.DataFrame):
@@ -116,7 +116,7 @@ def delayPlots(frame: pd.DataFrame, resDir:str):
         ax.set_xlabel('Count of Occurances')
         ax.set_ylabel('Delay Time')
         ax.set_title('Top 20 Occurances of Delays from ' + str(delay))
-        plt.savefig("../res/" + resDir +"_"+delay+"Analysis.jpg")
+        plt.savefig("../img/" + resDir +"_"+delay+"Analysis.jpg")
     
     # # filter out no delay data 0 min or less
     # carrierFrame = frame.query('CarrierDelay > 0.0')
@@ -144,7 +144,7 @@ def boxplotData(frame: pd.DataFrame, resDir:str):
     # fig, ax = plt.subplots()
     # ax.boxplot(boxplot_data)
     # ax.set_xticklabels(['CarrierDelay', 'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay'], rotation=45)
-    plt.savefig("../res/" + resDir +"_delayBoxPlot.jpg")
+    plt.savefig("../img/" + resDir +"_delayBoxPlot.jpg")
     # plt.show()
 
 
@@ -172,7 +172,7 @@ def DistanceAnalysis(frame: pd.DataFrame, num: int, resDir:str):
     ax.set_xlabel('Count')
     ax.set_ylabel('Distance Group')
     ax.set_title('Number of Flights by Distance Group')
-    plt.savefig("../res/" + resDir +"_DistanceAnalysis.jpg")
+    plt.savefig("../img/" + resDir +"_DistanceAnalysis.jpg")
 
 
 
