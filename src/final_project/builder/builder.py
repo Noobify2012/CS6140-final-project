@@ -144,7 +144,7 @@ def boxplotData(frame: pd.DataFrame, resDir:str):
     # ax.boxplot(boxplot_data)
     # ax.set_xticklabels(['CarrierDelay', 'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay'], rotation=45)
     plt.savefig("../res/" + resDir +"_delayBoxPlot.jpg")
-    plt.show()
+    # plt.show()
 
 
 def delayCounts(frame: pd.DataFrame, resDir:str):
