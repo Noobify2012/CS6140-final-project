@@ -1,24 +1,29 @@
 import torch.nn as nn
 import torch
+import numpy as np
+import matplotlib.pyplot as plt
 from tqdm import tqdm
+from tabulate import tabulate
 from sklearn.metrics import classification_report
 from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
 from torch.utils.data import DataLoader
 from torch.utils.data import TensorDataset
+from pathlib import Path
+import json
 
 class FeedForward(nn.Module):
-    def __init__(self, num_hidden_layers, num_nodes:int, num_features: int, activation_fn) -> None:
+    def __init__(self, num_hidden_layers:int, num_nodes:int, num_features: int, dropout_prob:float, activation_fn) -> None:
         super(FeedForward, self).__init__()
         self.num_classes = 2
         self.activation = activation_fn
-
+        dropout_prob = 0
         layers_list = [nn.Flatten(), nn.Linear(num_features, num_nodes)]
         if num_hidden_layers > 1:
             for i in range(num_hidden_layers):
-                layers_list.extend([self.activation(),nn.Linear(num_nodes, num_nodes)])
+                layers_list.extend([nn.Dropout(dropout_prob),self.activation(),nn.Linear(num_nodes, num_nodes)])
 
-        layers_list.extend([self.activation(), nn.Linear(num_nodes, 1)])
+        layers_list.extend([nn.Dropout(dropout_prob),self.activation(), nn.Linear(num_nodes, 1)])
         self.layers= nn.Sequential(*layers_list)
 
     def forward(self, xb):
@@ -27,7 +32,7 @@ class FeedForward(nn.Module):
         
     # TODO add momentum
     def fit(self, train_dataset: TensorDataset, validation_dataset: TensorDataset, batch_size: int, 
-            epochs: int, loss_function, learning_rate: float):
+            epochs: int, loss_function, learning_rate: float, momentum:float, weight_decay:float):
         
         # create dataloader for batching, shuffle to avoid overfitting/batch correlation
         train_dl = DataLoader(train_dataset, batch_size, shuffle=True)
@@ -36,7 +41,7 @@ class FeedForward(nn.Module):
         # TODO tune optimizer
         # opt = torch.optim.SGD(self.parameters(), lr=learning_rate, momentum=.9, weight_decay=.0000001) # create optimizer TODO weight decay
         # opt = torch.optim.SGD(self.parameters(), lr=learning_rate) # create optimizer TODO weight decay
-        opt = torch.optim.SGD(self.parameters(), lr=learning_rate)
+        opt = torch.optim.SGD(self.parameters(), lr=learning_rate, momentum=momentum, weight_decay=weight_decay)
         # store epoch losses
         training_losses = []
         validation_losses = []
@@ -124,3 +129,117 @@ class FeedForward(nn.Module):
             
             return mean_accuracy, class_accuracy, classifier_scores, confusion_mtx
 
+def ffn_evaluate(model, train_ds, test_ds, valid_ds):
+# plot losses
+    plt.plot(model["training_losses"], label="Training Loss")
+    # print(model["training_losses"])
+    plt.plot(model["valid_losses"], label="Validation Loss")
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.legend()
+    plt.show()
+
+    # calculate accuracy
+    d = {"train": train_ds, "test": test_ds, "validation": valid_ds}
+    for dataset in d:
+        print(f"Evaluating **{dataset}** dataset:")
+        mean_accuracy, class_accuracy, classifier_scores, confusion_matrix = model["model"].score(d[dataset], model["bs"])
+        print(f"Mean Accuracy: {mean_accuracy*100:.3f}")
+        print(f"Mean per-class accuracy:")
+        for key in class_accuracy:
+            print(f"  {'delayed' if key==1 else 'on time'}{': '}{class_accuracy[key]*100:.3f}%")
+        print(classifier_scores)
+        print(confusion_matrix)
+        print()
+
+def ffn_tune(param_dict, loss_function, num_features, train_ds, valid_ds):
+    # best_model = {key:param_dict[key] for key in param_dict}
+    best_model = {}
+    best_model["best_loss"] = np.inf # infinity
+    for num_nodes in param_dict["num_nodes"]:
+        for num_layers in param_dict["num_layers"]:
+            for bs in param_dict["bs"]:
+                for epoch in param_dict["epoch"]:
+                    for lr in param_dict["learning_rate"]:
+                        for momentum in param_dict["momentum"]:
+                            for weight_decay in param_dict["weight_decay"]:
+                                for dropout_prob in param_dict["dropout_prob"]:
+                                    # use validation loss
+                                    model = FeedForward(num_hidden_layers=num_layers, 
+                                                        num_nodes=num_nodes, 
+                                                        num_features=num_features, 
+                                                        dropout_prob=dropout_prob, 
+                                                        activation_fn=param_dict["activation_fn"])
+                                    training_losses, valid_losses = model.fit(train_dataset=train_ds, 
+                                                                            validation_dataset=valid_ds, 
+                                                                            batch_size=bs, 
+                                                                            epochs=epoch, 
+                                                                            loss_function=loss_function, 
+                                                                            learning_rate=lr,
+                                                                            momentum=momentum,
+                                                                            weight_decay=weight_decay)
+                                    if valid_losses[-1] < best_model["best_loss"]:
+                                        best_model["model"]=model
+                                        best_model["best_loss"] = valid_losses[-1]
+                                        best_model["epoch"] = epoch
+                                        best_model["learning_rate"] = lr
+                                        best_model["bs"] = bs
+                                        best_model["valid_losses"] = valid_losses
+                                        best_model["training_losses"] = training_losses
+                                        best_model["num_layers"] = num_layers
+                                        best_model["num_nodes"] = num_nodes
+                                        best_model["dropout_prob"] = dropout_prob
+                                        best_model["weight_decay"] = weight_decay
+                                        best_model["momentum"] = momentum
+                                        best_model["activation_fn"] = param_dict["activation_fn"]
+
+                                    print("best loss: ", best_model["best_loss"])
+    return best_model
+
+def run_model(param_dict:dict, train_ds, test_ds, valid_ds, num_features:int):
+    loss_function = nn.BCEWithLogitsLoss()
+    best_model = ffn_tune(param_dict, loss_function, num_features, train_ds=train_ds, valid_ds=valid_ds)
+    print_table = [
+        ["Best batch size:", best_model["bs"]],
+        ["Best epoch:", best_model["epoch"]],
+        ["Best learning rate:", best_model["learning_rate"]],
+        ["Best num nodes:", best_model["num_nodes"]],
+        ["Best num layers:", best_model["num_layers"]],
+        ["Best momentum:", best_model["momentum"]],
+        ["Best weight decay:", best_model["weight_decay"]],
+        ["Best dropout probability:", best_model["dropout_prob"]]
+        ]
+
+    print(tabulate(print_table, headers=["Hyperparameter", "Value"], tablefmt="grid"))
+
+    ffn_evaluate(model=best_model,
+                 train_ds=train_ds,
+                 test_ds=test_ds,
+                 valid_ds=valid_ds
+                 )
+    
+    state = best_model["model"].state_dict()
+    best_model_params={"num_nodes": best_model["num_nodes"], 
+                       "num_layers":best_model["num_layers"], 
+                       "num_features":num_features,
+                       "state":state,
+                       "dropout_prob":best_model["dropout_prob"],
+                       "activation_fn":param_dict["activation_fn"]}
+    return best_model_params
+
+def save_model_json(model_params:dict):
+    num_layers = model_params["num_layers"]
+    num_nodes = model_params["num_nodes"]
+    filename = Path.cwd().parent / "models" / f"{num_layers}_{num_nodes}_state_dict.json"
+    with open(filename, 'w') as json_file:
+        json.dump(model_params, json_file)
+
+def load_model(filename):
+    with open(filename, 'r') as json_file:
+        params = json.load(json_file)
+    model = FeedForward(num_hidden_layers=params["num_layers"], 
+                    num_nodes=params["num_nodes"], 
+                    num_features=params["num_features"], 
+                    dropout_prob=params["dropout_prob"], 
+                    activation_fn=params["activation_fn"])
+    model.load_state_dict(params["state"])
