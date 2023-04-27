@@ -51,7 +51,7 @@ def get_svm_param(
     return {
         "svm__gamma": gamma,
         "svm__C": c_list,
-        "svm__coef0": coef0,
+        # "svm__coef0": coef0,
         "svm__kernel": kernel,
     }
 
