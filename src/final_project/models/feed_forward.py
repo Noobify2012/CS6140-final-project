@@ -1,5 +1,6 @@
 import torch.nn as nn
 import torch
+import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
@@ -165,6 +166,10 @@ class FeedForward(nn.Module):
                 y_prob = torch.cat((y_prob, probabilities))
                 y_pred = torch.round(y_prob).to(torch.int32)
             
+            ground_truth_labels = pd.DataFrame(ground_truth_labels.numpy())
+            y_prob = pd.DataFrame(y_prob.numpy())
+            y_pred = pd.DataFrame(y_pred.numpy())
+
             return ground_truth_labels, y_prob, y_pred
 
 
@@ -282,7 +287,7 @@ def run_model(param_dict:dict, train_ds, test_ds, valid_ds, num_features:int):
                        "state":state,
                        "dropout_prob":best_model["dropout_prob"],
                        "activation_fn":param_dict["activation_fn"]}
-    return best_model_params
+    return best_model_params, best_model["model"]
 
 
 def save_model_pkl(model_params:dict):
