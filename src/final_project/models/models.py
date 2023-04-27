@@ -7,7 +7,7 @@ from sklearn.metrics import f1_score, precision_recall_fscore_support
 from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
-from sklearn.svm import SVC
+from sklearn.svm import SVC, LinearSVC
 from typing import Any, Dict, List
 
 model_dir = Path.cwd().parent / "models"
@@ -31,6 +31,7 @@ def get_pipeline(model_type: ModelENUM) -> Pipeline:
     """Returns a pipeline appropriate for the given model"""
     if model_type is ModelENUM.SVM:
         steps = [("scaler", StandardScaler()), ("svm", SVC())]
+        # steps = [("scaler", StandardScaler()), ("svm", LinearSVC())]
     elif model_type is ModelENUM.LR:
         steps = [("lr", LogisticRegression())]
     else:
