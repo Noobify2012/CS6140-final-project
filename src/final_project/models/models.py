@@ -6,7 +6,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import f1_score, precision_recall_fscore_support
 from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.svm import SVC, LinearSVC
 from typing import Any, Dict, List
 
@@ -30,7 +30,8 @@ class ModelENUM(Enum):
 def get_pipeline(model_type: ModelENUM) -> Pipeline:
     """Returns a pipeline appropriate for the given model"""
     if model_type is ModelENUM.SVM:
-        steps = [("scaler", StandardScaler()), ("svm", SVC())]
+        # steps = [("scaler", StandardScaler()), ("svm", SVC())]
+        steps = [("scaler", MinMaxScaler()), ("svm", SVC())]
         # steps = [("scaler", StandardScaler()), ("svm", LinearSVC())]
     elif model_type is ModelENUM.LR:
         steps = [("lr", LogisticRegression())]
@@ -46,13 +47,18 @@ def get_svm_param(
     c_list: List[float] = [0.001, 0.01, 0.1, 1, 10],
     coef0: List[float] = [0.0, 0.01, 0.1, 1],
     kernel: List[str] = ["poly", "sigmoid"],
+    max_iter: List[int] = [1000],
+    cache_size: List[float] = [4000]
 ) -> Dict[str, List[Any]]:
     """Return the the parameters to iterate over for a GridSearchCV for SVM"""
     return {
-        "svm__gamma": gamma,
+        "svm__gamma": gamma, #for poly
         "svm__C": c_list,
-        # "svm__coef0": coef0,
+        "svm__coef0": coef0,
         "svm__kernel": kernel,
+        "svm__probability": [True],
+        "svm__max_iter": max_iter,
+        "svm__cache_size": cache_size
     }
 
 
@@ -95,6 +101,12 @@ def get_best_params(
 ) -> Dict[str, Any]:
     """Get a dictionary of the best performing  parameters for the model"""
     params = model.best_estimator_.get_params()
+    # return {
+    #     "gamma": params["svm__gamma"],
+    #     "kernel": params["svm__kernel"],
+    #     "C": params["svm__C"],
+    # }
+
     if model_type is ModelENUM.LR:
         return {
             "solver": params["lr__solver"],
@@ -106,7 +118,6 @@ def get_best_params(
             "gamma": params["svm__gamma"],
             "kernel": params["svm__kernel"],
             "C": params["svm__C"],
-            "penalty": params["svm__penalty"],
         }
     else:
         raise ValueError(
