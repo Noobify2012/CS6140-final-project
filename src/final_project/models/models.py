@@ -1,4 +1,5 @@
 import joblib
+import json
 
 from enum import Enum
 from pathlib import Path
@@ -32,10 +33,12 @@ def get_pipeline(model_type: ModelENUM) -> Pipeline:
     if model_type is ModelENUM.SVM:
         # steps = [("scaler", StandardScaler()), ("svm", SVC())]
         steps = [("scaler", MinMaxScaler()), ("svm", SVC())]
+        # steps = [("svm", SVC())]
         # steps = [("scaler", StandardScaler()), ("svm", LinearSVC())]
     elif model_type is ModelENUM.LR:
         # steps = [("lr", LogisticRegression())]
-        steps = [("scaler", MinMaxScaler()), ("lr", LogisticRegression())]
+        steps = [("scaler", MinMaxScaler()), ("lr", LogisticRegression(n_jobs=20))]
+        # steps = [("lr", LogisticRegression(n_jobs=20))]
     else:
         raise ValueError(
             f"ModelENUM value {model_type} has not been accounted for"
@@ -61,7 +64,9 @@ def get_svm_param(
         "svm__probability": [True],
         "svm__max_iter": max_iter,
         "svm__cache_size": cache_size,
-        "svm__degree": degree
+        "svm__degree": degree,
+        "svm__shrinking" : [True],
+        "svm__verbose": [True]
     }
 
 
@@ -86,7 +91,7 @@ def get_grid_search_cv(
     scoring: str = "f1",
     cv: int = 3,
     verbose: int = 10,
-    n_jobs: int = 20,
+    n_jobs: int = 5,
 ) -> GridSearchCV:
     """Return a properly formed GridSearchCV to run"""
     return GridSearchCV(
@@ -95,7 +100,7 @@ def get_grid_search_cv(
         scoring=scoring,
         cv=cv,
         verbose=verbose,
-        n_jobs=n_jobs,
+        # n_jobs=n_jobs,
     )
 
 
@@ -155,6 +160,8 @@ def analyze_model(model, x_test, x_train, y_test, y_train) -> Dict[str, Any]:
         "F-Beta Score": prf[2],
         "F1 Score": f1
     }
+
+
 
 
     # print(f"Test accuracy: {test_accuracy}")
