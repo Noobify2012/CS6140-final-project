@@ -157,7 +157,7 @@ class FeedForward(nn.Module):
 
                 # run model on batch
                 class_probabilities = self(xb)
-            
+
                 # choose most likely class for each sample
                 probabilities = torch.sigmoid(class_probabilities).squeeze()
 
