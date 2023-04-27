@@ -132,8 +132,9 @@ drop_columns = [
 class FileSourceEnum(Enum):
     """Simple enum to help differentiate when running on kaggle or local."""
 
-    LOCAL = ("local", Path.cwd().parent / "raw")
+    NOTEBOOK = ("notebook", Path.cwd().parent / "raw")
     KAGGLE = ("kaggle", Path("/kaggle/input"))
+    LOCAL = ("local"), Path.cwd() / "raw"
 
     def __init__(self, title: str, path: Path):
         self._title = title
@@ -154,12 +155,13 @@ def get_location() -> FileSourceEnum:
     """
     if FileSourceEnum.KAGGLE.path.exists():
         return FileSourceEnum.KAGGLE
+    elif FileSourceEnum.NOTEBOOK.path.exists():
+        return FileSourceEnum.NOTEBOOK
     elif FileSourceEnum.LOCAL.path.exists():
         return FileSourceEnum.LOCAL
     else:
         raise FileNotFoundError(
-            f"couldn't find Kaggle files or local files "
-            + "in {FileSourceEnum.LOCAL.path}"
+            f"couldn't find Kaggle files or local files"
         )
 
 
@@ -216,7 +218,7 @@ def _get_df_from_csv(
 
 
 def _save_df(name: str, df: pd.DataFrame) -> None:
-    if get_location() != FileSourceEnum.LOCAL:
+    if get_location() != FileSourceEnum.NOTEBOOK:
         raise ValueError("Can't save when not running locally")
 
     res_dir.mkdir(parents=True, exist_ok=True)
@@ -224,7 +226,7 @@ def _save_df(name: str, df: pd.DataFrame) -> None:
 
 
 def _load_pickle(file: str) -> pd.DataFrame:
-    if get_location() == FileSourceEnum.LOCAL:
+    if get_location() == FileSourceEnum.NOTEBOOK:
         return pd.read_pickle(res_dir / file)
     raise ValueError("Not local bro!")
 
