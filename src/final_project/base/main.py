@@ -85,17 +85,8 @@ def train_lr(x_train: List, y_train: List) -> Type[GridSearchCV]:
     return model
 
 def train_svm(x_train: List, y_train: List) -> Type[GridSearchCV]:
-    # linear_svc= LinearSVC(
-    #     penalty='l2',
-    #     loss='squared_hinge',
-    #     C=1,
-    #     verbose=10,
-    #     max_iter=1500,
-    # )
-    # svc = CalibratedClassifierCV(linear_svc)
     svc = SVC(
         kernel="sigmoid",
-        # degree=4,
         C=1,
         gamma='scale',
         coef0=0,
@@ -103,8 +94,6 @@ def train_svm(x_train: List, y_train: List) -> Type[GridSearchCV]:
         cache_size=4000,
         verbose=True, max_iter=1500,
     )
-
-    
     model = make_pipeline(StandardScaler(), svc)
     start_time = time.time()
     with joblib.parallel_backend('threading', n_jobs=5):
