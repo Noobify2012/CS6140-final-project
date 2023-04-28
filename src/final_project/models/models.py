@@ -1,4 +1,5 @@
 import joblib
+import json
 
 from enum import Enum
 from pathlib import Path
@@ -32,9 +33,12 @@ def get_pipeline(model_type: ModelENUM) -> Pipeline:
     if model_type is ModelENUM.SVM:
         # steps = [("scaler", StandardScaler()), ("svm", SVC())]
         steps = [("scaler", MinMaxScaler()), ("svm", SVC())]
+        # steps = [("svm", SVC())]
         # steps = [("scaler", StandardScaler()), ("svm", LinearSVC())]
     elif model_type is ModelENUM.LR:
-        steps = [("lr", LogisticRegression())]
+        # steps = [("lr", LogisticRegression())]
+        steps = [("scaler", MinMaxScaler()), ("lr", LogisticRegression(n_jobs=20))]
+        # steps = [("lr", LogisticRegression(n_jobs=20))]
     else:
         raise ValueError(
             f"ModelENUM value {model_type} has not been accounted for"
@@ -48,7 +52,8 @@ def get_svm_param(
     coef0: List[float] = [0.0, 0.01, 0.1, 1],
     kernel: List[str] = ["poly", "sigmoid"],
     max_iter: List[int] = [1000],
-    cache_size: List[float] = [4000]
+    cache_size: List[float] = [4000],
+    degree: List[int] = [3]
 ) -> Dict[str, List[Any]]:
     """Return the the parameters to iterate over for a GridSearchCV for SVM"""
     return {
@@ -58,7 +63,10 @@ def get_svm_param(
         "svm__kernel": kernel,
         "svm__probability": [True],
         "svm__max_iter": max_iter,
-        "svm__cache_size": cache_size
+        "svm__cache_size": cache_size,
+        "svm__degree": degree,
+        "svm__shrinking" : [True],
+        "svm__verbose": [True]
     }
 
 
@@ -83,7 +91,7 @@ def get_grid_search_cv(
     scoring: str = "f1",
     cv: int = 3,
     verbose: int = 10,
-    n_jobs: int = 20,
+    n_jobs: int = 5,
 ) -> GridSearchCV:
     """Return a properly formed GridSearchCV to run"""
     return GridSearchCV(
@@ -92,7 +100,7 @@ def get_grid_search_cv(
         scoring=scoring,
         cv=cv,
         verbose=verbose,
-        n_jobs=n_jobs,
+        # n_jobs=n_jobs,
     )
 
 
@@ -101,12 +109,13 @@ def get_best_params(
 ) -> Dict[str, Any]:
     """Get a dictionary of the best performing  parameters for the model"""
     params = model.best_estimator_.get_params()
-    # return {
-    #     "gamma": params["svm__gamma"],
-    #     "kernel": params["svm__kernel"],
-    #     "C": params["svm__C"],
-    # }
 
+    # return {
+    #     "solver": params["lr__solver"],
+    #     "penalty": params["lr__penalty"],
+    #     "C": params["lr__C"],
+    # }
+ 
     if model_type is ModelENUM.LR:
         return {
             "solver": params["lr__solver"],
@@ -137,16 +146,27 @@ def save_model(model_type: ModelENUM, model: GridSearchCV) -> None:
     file_string += ".pkl"
     joblib.dump(best_estimator, model_dir / file_string)
 
-def analyze_model(model, x_test, x_train, y_test, y_train):
+def analyze_model(model, x_test, x_train, y_test, y_train) -> Dict[str, Any]:
     test_accuracy = model.score(x_test, y_test)
     train_accuracy = model.score(x_train, y_train)
     y_pred = model.predict(x_test)
     f1 = f1_score(y_test, y_pred)
     prf = precision_recall_fscore_support(y_test, y_pred, average='binary') # TODO different average values: micro macro binary weighted samples
+    return {
+        "Test Accuracy": test_accuracy,
+        "Train Accuracy": train_accuracy,
+        "Precision": prf[0],
+        "Recall": prf[1],
+        "F-Beta Score": prf[2],
+        "F1 Score": f1
+    }
 
-    print(f"Test accuracy: {test_accuracy}")
-    print(f"Train accuracy: {train_accuracy}")
-    print(f"Precision: {prf[0]}")
-    print(f"Recall: {prf[1]}")
-    print(f"F-Beta Score: {prf[2]}")
-    print(f"F1 Score: {f1}")
+
+
+
+    # print(f"Test accuracy: {test_accuracy}")
+    # print(f"Train accuracy: {train_accuracy}")
+    # print(f"Precision: {prf[0]}")
+    # print(f"Recall: {prf[1]}")
+    # print(f"F-Beta Score: {prf[2]}")
+    # print(f"F1 Score: {f1}")

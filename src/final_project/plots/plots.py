@@ -1,11 +1,20 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+from final_project import loader
 from pathlib import Path
-from sklearn.metrics import auc, ConfusionMatrixDisplay, f1_score, precision_recall_curve
+from sklearn.metrics import (
+    accuracy_score,
+    auc,
+    ConfusionMatrixDisplay,
+    f1_score,
+    log_loss,
+    precision_recall_curve,
+)
 
 
-img_dir = Path.cwd().parent / "img"
+location = loader.get_location()
+img_dir = location.root_dir / "img"
 model_dir = img_dir / "model_analysis"
 model_dir.mkdir(parents=True, exist_ok=True)
 
@@ -37,15 +46,24 @@ def save_precision_recall_curve(
         va="bottom",
         bbox=dict(boxstyle="round", fc="w"),
     )
-    plt.savefig(model_dir / file_name)
+    plt.savefig(model_dir / f"{file_name}_prc")
+
 
 def save_confusion_matrix(
-        model_name: str,
-        file_name: str,
-        y_test: np.ndarray,
-        y_pred: np.ndarray
+    model_name: str, file_name: str, y_test: np.ndarray, y_pred: np.ndarray
 ) -> None:
     ConfusionMatrixDisplay.from_predictions(y_test, y_pred)
     plt.title(f"Confusion Matrix for {model_name}")
-    plt.savefig(model_dir/ file_name)
+    plt.savefig(model_dir / f"{file_name}_cm")
 
+
+def save_acc_loss_plot(
+    model_name: str, file_name: str, y_test, y_pred
+) -> None:
+    accuracy = accuracy_score(y_test, y_pred)
+    loss = log_loss(y_test, y_pred)
+    plt.plot(["Accuracy", "Loss"], [accuracy, loss])
+    plt.title(f"Accuracy/Loss Plot for {model_name}")
+    plt.xlabel("Metric")
+    plt.ylabel("Score")
+    plt.savefig(model_dir / f"{file_name}_acc_loss")
