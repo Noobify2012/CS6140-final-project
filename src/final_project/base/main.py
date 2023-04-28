@@ -18,13 +18,13 @@ from docopt import docopt
 from final_project import loader, builder, models, plots
 from final_project.models import ModelENUM
 
-# from joblib import parallel_backend 
 from pathlib import Path
+from sklearn.calibration import CalibratedClassifierCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.model_selection import GridSearchCV, train_test_split
-from sklearn.svm import SVC
+from sklearn.svm import SVC, LinearSVC
 from torch.nn import Module
 from typing import List, Tuple, Type
 
@@ -70,7 +70,6 @@ def train_lr(x_train: List, y_train: List) -> Type[GridSearchCV]:
     lr = LogisticRegression(
         solver="saga",
         penalty="l1",
-        # l1_ratio=0.9,
         fit_intercept=True,
         max_iter=1500,
         verbose=10,
@@ -82,74 +81,24 @@ def train_lr(x_train: List, y_train: List) -> Type[GridSearchCV]:
     joblib.dump(model, _model_dir / "lr_model.pkl")
     return model
 
-
-    # lr_pipeline = models.get_pipeline(ModelENUM.LR)
-    # param_grid = [
-    #     models.get_lr_param(
-    #         solver="liblinear", 
-    #         penalty=["l2"], 
-    #         c_list=[1], 
-    #         max_iter=[1000]
-    #     )
-    # ]
-    # grid_model = models.get_grid_search_cv(
-    #     pipeline=lr_pipeline, param_grid=param_grid, cv=5, n_jobs=30
-    # )
-    # start_time = time.time()
-    # with joblib.parallel_backend('threading', n_jobs=5):
-    #     grid_model.fit(x_train, y_train)
-    # end_time = time.time()
-    # print(f"Total time: {end_time - start_time}")
-    # models.save_model(ModelENUM.LR, grid_model)
-    # return grid_model
-
-
 def train_svm(x_train: List, y_train: List) -> Type[GridSearchCV]:
-    svc = SVC(
-        gamma="scale",
-        kernel="poly",
-        degree=4,
-        coef0=1,
-        shrinking=True,
+    linear_svc= LinearSVC(
+        penalty='l2',
+        loss='squared_hinge',
         C=1,
-        cache_size=8e3,
-        max_iter=1000,
-        verbose=True,
-        probability=True
+        verbose=10,
+        max_iter=1500,
     )
-    # svc = SVC(
-    #     gamma="auto",
-    #     kernel="linear",
-    #     C=10,
-    #     cache_size=4e3,
-    #     max_iter=5000,
-    #     verbose=10,
-    #     probability=True
-    # )
+    svc = CalibratedClassifierCV(linear_svc)
+
 
  
     model = make_pipeline(StandardScaler(), svc)
-    # svc_pipeline = models.get_pipeline(ModelENUM.SVM)
-    # param_grid = [
-    #     models.get_svm_param(
-    #         gamma=["auto"],
-    #         c_list=[10],
-    #         coef0=[0],
-    #         kernel=["linear"],
-    #         max_iter=[1000],
-    #         cache_size=[4000],
-    #     )
-    # ]
-    # grid_model = models.get_grid_search_cv(
-    #     pipeline=svc_pipeline, param_grid=param_grid, cv=5, n_jobs=30
-    # )
     start_time = time.time()
     with joblib.parallel_backend('threading', n_jobs=5):
         model.fit(x_train, y_train)
     end_time = time.time()
     print(f"Total time: {end_time - start_time}")
-    # models.save_model(ModelENUM.SVM, model)
-
     joblib.dump(model, _model_dir / "svm_model.pkl")
     return model
 
@@ -171,6 +120,7 @@ def save_plots(
         model_type.title, file_name, y_test, y_prob
     )
     plots.save_confusion_matrix(model_type.title, file_name, y_test, y_pred)
+    plots.save_acc_loss_plot(model_type.title, file_name, y_test, y_pred)
 
 
 def run() -> None:
@@ -185,8 +135,9 @@ def run() -> None:
         with open(_model_dir / f"{name}.json", 'w') as f:
             json.dump(stats, f)
     elif arguments["svm"]:
+        name = "svm_best_model"
         model = train_svm(x_train, y_train)
-        save_plots(ModelENUM.SVM, "svm_best_model", x_test, y_test, model)
+        save_plots(ModelENUM.SVM, name, x_test, y_test, model)
         stats = models.analyze_model(model, x_test, x_train, y_test, y_train)
         with open(_model_dir / f"{name}.json", 'w') as f:
             json.dump(stats, f)
