@@ -1,9 +1,9 @@
 """Train models.
 
 Usage:
-    train.py lr
-    train.py svm
-    train.py ffn
+    final-project lr     
+    final-project svm    
+    final-project ffn    
 
 Options:
     -h --help     Show this screen.
@@ -40,7 +40,6 @@ def get_massaged_df() -> pd.DataFrame:
             "DistanceGroup",
             "DayofMonth",
             "Month",
-            "Year",
             "Duplicate",
             "ArrDel15",
             "DistanceGroup",
@@ -82,17 +81,26 @@ def train_lr(x_train: List, y_train: List) -> Type[GridSearchCV]:
     return model
 
 def train_svm(x_train: List, y_train: List) -> Type[GridSearchCV]:
-    linear_svc= LinearSVC(
-        penalty='l2',
-        loss='squared_hinge',
+    # linear_svc= LinearSVC(
+    #     penalty='l2',
+    #     loss='squared_hinge',
+    #     C=1,
+    #     verbose=10,
+    #     max_iter=1500,
+    # )
+    # svc = CalibratedClassifierCV(linear_svc)
+    svc = SVC(
+        kernel="sigmoid",
+        # degree=4,
         C=1,
-        verbose=10,
-        max_iter=1500,
+        gamma='scale',
+        coef0=0,
+        probability=True,
+        cache_size=4000,
+        verbose=True, max_iter=1500,
     )
-    svc = CalibratedClassifierCV(linear_svc)
 
-
- 
+    
     model = make_pipeline(StandardScaler(), svc)
     start_time = time.time()
     with joblib.parallel_backend('threading', n_jobs=5):
@@ -120,7 +128,6 @@ def save_plots(
         model_type.title, file_name, y_test, y_prob
     )
     plots.save_confusion_matrix(model_type.title, file_name, y_test, y_pred)
-    plots.save_acc_loss_plot(model_type.title, file_name, y_test, y_pred)
 
 
 def run() -> None:
