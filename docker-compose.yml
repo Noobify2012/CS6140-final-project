@@ -29,6 +29,9 @@ services:
       - type: bind
         source: ./exploration
         target: /FINAL_PROJECT/exploration
+      - type: bind
+        source: ./raw
+        target: /FINAL_PROJECT/raw
 
   # flights-db:
   #   container_name: 'flights-db'

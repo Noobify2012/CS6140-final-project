@@ -17,6 +17,7 @@ import time
 from docopt import docopt
 from final_project import loader, builder, models, plots
 from final_project.models import ModelENUM
+from final_project.models import run_model
 
 from pathlib import Path
 from sklearn.calibration import CalibratedClassifierCV
@@ -25,7 +26,10 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.model_selection import GridSearchCV, train_test_split
 from sklearn.svm import SVC, LinearSVC
+import torch
+import torch.nn as nn
 from torch.nn import Module
+from torch.utils.data import TensorDataset
 from typing import List, Tuple, Type
 
 _model_dir = Path.cwd() / "models" / "trained_models"
@@ -81,17 +85,8 @@ def train_lr(x_train: List, y_train: List) -> Type[GridSearchCV]:
     return model
 
 def train_svm(x_train: List, y_train: List) -> Type[GridSearchCV]:
-    # linear_svc= LinearSVC(
-    #     penalty='l2',
-    #     loss='squared_hinge',
-    #     C=1,
-    #     verbose=10,
-    #     max_iter=1500,
-    # )
-    # svc = CalibratedClassifierCV(linear_svc)
     svc = SVC(
         kernel="sigmoid",
-        # degree=4,
         C=1,
         gamma='scale',
         coef0=0,
@@ -99,8 +94,6 @@ def train_svm(x_train: List, y_train: List) -> Type[GridSearchCV]:
         cache_size=4000,
         verbose=True, max_iter=1500,
     )
-
-    
     model = make_pipeline(StandardScaler(), svc)
     start_time = time.time()
     with joblib.parallel_backend('threading', n_jobs=5):
@@ -111,9 +104,47 @@ def train_svm(x_train: List, y_train: List) -> Type[GridSearchCV]:
     return model
 
 
-def train_ffn(x_train: List, y_train: List) -> Type[Module]:
+def train_ffn(x_train: List, y_train: List, x_test, y_test) -> Type[Module]:
     print("Training feedforward network model...")
+    print("Using: ","cuda" if torch.cuda.is_available() else "cpu")
 
+    X_train = x_train
+    X_test, X_validation, y_test, y_validation = train_test_split(x_test, y_test,
+                                                    test_size=0.5,
+                                                    random_state=150)
+    # create train numpy arrays
+    X_train = X_train.to_numpy()
+    X_test = X_test.to_numpy()
+    X_validation = X_validation.to_numpy()
+
+    # convert to tensors
+    X_train, y_train, X_test, y_test, X_validation, y_validation = map(
+        torch.tensor, (X_train, y_train, X_test, y_test, X_validation, y_validation)
+    )
+    # create dataset and dataloader
+    train_ds = TensorDataset(X_train, y_train)
+    test_ds = TensorDataset(X_test, y_test)
+    valid_ds = TensorDataset(X_validation, y_validation)
+    num_features=X_train.shape[1] 
+
+    params = {"bs":(64,),
+            "epoch":(50,),
+            "learning_rate":(.01,),
+            "momentum":(.09,),
+            "weight_decay":(.0001,),
+            "activation_fn": nn.ReLU,
+            "dropout_prob": (.5,),
+            "num_layers": (4,),
+            "num_nodes": (90,)}
+    best_model_params, best_model = run_model(param_dict=params, 
+                    train_ds=train_ds, 
+                    test_ds=test_ds, 
+                    valid_ds=valid_ds,
+                    num_features=num_features
+                    )
+    ground_truth_labels, y_prob, y_pred = best_model.predict(test_ds)
+    plots.save_precision_recall_curve("ffn", "ffn_4_90_prec_rec_curve", ground_truth_labels, y_prob)
+    plots.save_confusion_matrix("ffn", "ffn_4_90_confusion", ground_truth_labels, y_pred)
 
 def save_plots(
     model_type: ModelENUM,
@@ -149,6 +180,6 @@ def run() -> None:
         with open(_model_dir / f"{name}.json", 'w') as f:
             json.dump(stats, f)
     elif arguments["ffn"]:
-        model = train_ffn(x_train, y_train)
-    
+        model = train_ffn(x_train, y_train, x_test, y_test)
+        
 

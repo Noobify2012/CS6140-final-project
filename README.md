@@ -4,111 +4,71 @@ Authors: Daniel Blum, Matthew Greene, Bram Ziltzer
 
 Summary:  A classification project using Logistic Regression, SVMs, and DNNs to predict if a flight will be delayed or not.
 
-# The Docker Python Environment
-The project is running in a collection of docker images via `docker compose`.
-The `jupyter-lab` image runs a Debian instance with [Mamba] as the environment manager.
+# Running the project
 
-## Running the Poetry Environment
+### Perquisites
+To run, you must have the raw data in the top level project directory.
+[Use this kaggle link to download the raw data][Kaggle raw], and place it in a top level project directory under `./raw`.
 
-> ### Prerequisites:
-> - Docker
-> - Something to run Jupyter Notebook/Lab UI like [VSCode] or [DataSpell]
+Also, the project assumes ***Python 3.11.\*.***
+If you don't have this, I recommend installing [Pyenv] (for many, many reasons), and installing 3.11.2 as a local python for this project.
 
-1. `cd` into the parent directory of the project
-1. run `docker compose up -d`
+## Locally
 
-Docker is going to do its thing for a bit and download a good amount of stuff.
-Once done, you should have control over the terminal (as the `-d` is the detached option for `docker compose`).
+### Poetry
+The project is based on [Poetry], so if you have poetry installed, just run 
+```bash
+poetry install
+```
+and everything will dump into an appropriate virtual env for you to run. 
+Just make sure you have the poetry virtual environment running.
 
-If you run `docker ps`, you should have these running services:
-- jupyter-lab
-<!-- - flights-db
-- pgadmin -->
+If you've never done this, I recommend the following:
+1. First, run 
+```bash
+poetry config virtualenvs.prefer-active-python true
+```
+This will make sure `.venv` files will be located in the project directory.
 
-<!-- You should also see two new volumes with `docker volumes ls`:
-- cs6140-final-project_flights-db-volume
-- cs6140-final-project_pgadmin-db-volume -->
+2. Running this is VS Code and install the [Python extension] and the [Jupyter extension].
 
-And a new network with `docker network ls`:
-- cs6140-final-project_cs6140-network
+If you want to use PyCharm or DataSpell, [reach out to me](mailto:blum.da@northeastern.edu)
 
-## Updating Poetry
-If you need to add libraries 
-TODO (dan) - FILL IN
-<!-- ## Updating Mamba 
-If you need to add libraries to the `jupyter-lab` service, it's easiest to do from inside the service:
+### CLI
+If you're in the poetry shell venv for this project, just run `poetry build` to give you access to the simple CLI wrapper. 
+Running 
+```bash
+final-project -h
+```
+will give you a little helper to show how to get the code running.
+It will output some new png files, saved models, and a json with some stats in various folders.
 
-1. Run `docker exec -it jupyter-lab /bin/bash` to get CLI access.
-1. If not in the `app` folder, go ahead and `cd /app`.
-1. Add the library you need with `mamba install -c conda-forge [library_name]`.
-    > *note:* sometimes library names are different between *pip* and *conda-forge*, so its best to do a google search for the library with the term 'conda-forge' added for the name of the library if you can't find it.
-1. Once installed, run `mamba env export > environment.yml` to "update" the environment file.
-
-This update will persist during `docker compose up/down` operations but the `environment.yml` file will need to be updated in git. -->
-
-<!-- ### Pulling a Mamba Update
-
-If you're pulling a branch with an environment change, you want to force your image to rebuild.
-Run `docker compose up -d --force-recreate --build jupyter-lab` -->
-
-## Updating the PostgreSQL Image
-<!-- TODO (dan) UNDER CONSTRUCTION -->
-<!-- The Postgres image should be pretty self-contained. 
-There is an attached docker volume which will persist between bringing the service up and down.
-Not, this *is not* stored in git, so if you nuke the volume, you'll lose any changes you made to the DB that aren't committed to the relevant docker and sql files.
-
-If you need to update the `create-db.sql` DDL script, you must also bring down the attached volume.
-
-### If Docker is not running
-run `docker compose down -v` - this will remove named volumes
-
-### If Docker is running
-run `docker compose rm -sfv flights-db` - this will forcefully shut down and remove the service and attached volumes.
-Then, just `docker compose up -d` to relaunch all needed services.
- -->
-
-# Running Jupyter
-
-## VSCode
-> ### Prerequisites
->
-> - [Jupyter Extension] for VSCode
-> - [Python Extension] for VSCode
-
-When you open a `*.ipynb` file in VSCode, you'll want to the remote kernel running in docker.
-
-1. In the top right corner of the `ipynb` file, select `Select Kernel` (if you don't see this, it might have another kernel already selected)l.
-1. A drop-down pops up in the center of VSCode, select `Select Another Kernel`.
-1. Select `Existing Jupyter Server...`
-1. Enter `http://127.0.0.1:8889`
-1. Select `Python 3 (ipykernel)`, the kernel at `/mamba/bin/python`
-
-You should be all set!
-
-## Browser
-> ### Prerequisites
->
-> - A Web Browser
-
-Open up http://localhost:8889
-
-## DataSpell
-<!-- TODO (dan) UNDER CONSTRUCTION -->
-
-# Running Poetry
-*don't worry about this*
-<!-- TODO (dan) UNDER CONSTRUCTION -->
+### Jupyter
+If you have the [Jupyter extension] set up, you can run jupyter notebooks natively in VS code. 
+With the poetry venv installed, open up a `*.ipynb` file and make sure to select the local `.venv` environment.
 
 
+## Docker
+If you don't feel like dealing with any of this BS, there's some included docker files.
+Sor, you have to make sure you have [Docker] installed on your system.
+Once installed, head to the top level project directory and run
+```bash
+docker compose up -d
+```
 
-
-
+After some installs, this will launch a python/poetry environment running a jupyter server.
+Just go to `http://localhost:8889` to gain access.
 
 <!-- Links -->
-[VSCode]: https://code.visualstudio.com/download
 [Poetry]: https://python-poetry.org/docs/
+[Pyenv]: https://github.com/pyenv/pyenv
+[VSCode]: https://code.visualstudio.com/download
+[Docker]: https://docs.docker.com/get-docker/
 [Mamba]: https://mamba.readthedocs.io/en/latest/index.html
 [DataSpell]: https://www.jetbrains.com/dataspell/
 
 [Jupyter Extension]: https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter
 [Python Extension]: https://marketplace.visualstudio.com/items?itemName=ms-python.python
+
+
+[kaggle raw]: https://storage.googleapis.com/kaggle-data-sets/2529204/4295427/compressed/raw.zip?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=gcp-kaggle-com%40kaggle-161607.iam.gserviceaccount.com%2F20230428%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20230428T033007Z&X-Goog-Expires=259200&X-Goog-SignedHeaders=host&X-Goog-Signature=4308a0436957b68670876805cb62dd0aa4346615c15f882ab9afff59312a712fa783e981a2d43fa15dcac03ce1081fe620e5f8a7b8091b9237bafe60663ba7b234fd803b713e67db3f03ecc4c5e9fe772b557e92c6143d7f3ec9801c76579a09c4f9fd78f68341d31171419ca27f85e3e0a12bc5e7f61f93e4bb447ca0f8d06ff8a517b64c366b262baf419ff9ce7bebc9a5415e8d952845e92c7a99a3811739e0e7b7dde308d8ca1a38b5fd5354008c277799c6335025ee8aaa06276f8cad35a26ab86a743502674392b06fd88282d90a806067867ff3235f1fcb05233167e0e57a20843e33e24a8e9193c5371bf20a188b7a1e0eb0c0453e675eff4d7800e5
