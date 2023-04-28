@@ -37,7 +37,6 @@ class FeedForward(nn.Module):
     def fit(self, train_dataset: TensorDataset, validation_dataset: TensorDataset, batch_size: int, 
             epochs: int, loss_function, learning_rate: float, momentum:float, weight_decay:float):
         self.to(device)
-        print("using: ","cuda" if torch.cuda.is_available() else "cpu")
         # create dataloader for batching, shuffle to avoid overfitting/batch correlation
         train_dl = DataLoader(train_dataset, batch_size, shuffle=True)
         valid_dl = DataLoader(validation_dataset, batch_size, shuffle=True)
@@ -98,7 +97,6 @@ class FeedForward(nn.Module):
         return training_losses, validation_losses
 
     def score(self, tensor_dataset: TensorDataset, batch_size:int=64):
-        print("using: ","cuda" if torch.cuda.is_available() else "cpu")
         # reference: https://blog.paperspace.com/training-validation-and-accuracy-in-pytorch/
         self.eval()
         self.to(device)
@@ -143,7 +141,6 @@ class FeedForward(nn.Module):
             return mean_accuracy, class_accuracy, classifier_scores, confusion_mtx
 
     def predict(self, tensor_dataset: TensorDataset, batch_size:int=64):
-        print("using: ","cuda" if torch.cuda.is_available() else "cpu")
         self.eval()
         self.to(device)
         dataloader = DataLoader(tensor_dataset, batch_size, shuffle=True)
