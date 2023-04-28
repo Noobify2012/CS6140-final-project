@@ -1,5 +1,5 @@
 FROM debian:buster-slim as pyenv-setup
-ARG PYTHON_VERSION=3.10.11
+ARG PYTHON_VERSION=3.11.2
 
 RUN apt-get update && apt-get upgrade && apt-get install -y \
     --no-install-recommends \
@@ -40,10 +40,7 @@ ARG APP_NAME=FINAL_PROJECT
 ENV \
     POETRY_VERSION=${POETRY_VERSION} \
     POETRY_HOME=/${POETRY} \
-    # POETRY_VIRTUALENVS_IN_PROJECT=true \
-    # POETRY_VIRTUALENVS_CREATE=true \
     POETRY_VIRTUALENVS_CREATE=false 
-    # POETRY_NO_INTERACTION=true
 RUN curl -sSL https://install.python-poetry.org | python -
 WORKDIR /${APP_NAME}
 ENV PATH="$PATH:${POETRY_HOME}/bin"
@@ -52,6 +49,5 @@ COPY poetry.lock pyproject.toml README.md ./
 COPY ./src ./src
 RUN poetry install --no-interaction --no-ansi
 CMD ["poetry", "run"]
-# CMD ["python"]
 
 
