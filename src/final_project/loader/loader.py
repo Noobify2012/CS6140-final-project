@@ -17,10 +17,73 @@ from typing import List
 # dataset_user = "robikscube"
 # dataset_name = "flight-delay-dataset-20182022"
 
-res_dir = Path.cwd().parent / "res"
+# res_dir = Path.cwd().parent / "res"
 all_pickle_file = "df_all.pkl"
 
 drop_columns = [
+    "Quarter",
+    "FlightDate",
+    "Marketing_Airline_Network",
+    "Marketing_Airline_Network",
+    "Operated_or_Branded_Code_Share_Partners",
+    "DOT_ID_Marketing_Airline",
+    "IATA_Code_Marketing_Airline",
+    "Flight_Number_Marketing_Airline",
+    "Originally_Scheduled_Code_Share_Airline",
+    "DOT_ID_Originally_Scheduled_Code_Share_Airline",
+    "IATA_Code_Originally_Scheduled_Code_Share_Airline",
+    "Flight_Num_Originally_Scheduled_Code_Share_Airline",
+    "DOT_ID_Operating_Airline",
+    "IATA_Code_Operating_Airline",
+    "Flight_Number_Operating_Airline",
+    "OriginAirportID",
+    "OriginAirportSeqID",
+    "OriginCityMarketID",
+    "OriginCityName",
+    "OriginState",
+    "OriginStateFips",
+    "OriginStateName",
+    "OriginWac",
+    "DestAirportID",
+    "DestAirportSeqID",
+    "DestCityMarketID",
+    "DestCityName",
+    "DestState",
+    "DestStateFips",
+    "DestStateName",
+    "DestWac",
+    "CRSDepTime",
+    "DepDelay",
+    "DepDelayMinutes",
+    "DepDel15",
+    "DepartureDelayGroups",
+    "DepTimeBlk",
+    "TaxiOut",
+    "WheelsOff",
+    "WheelsOn",
+    "TaxiIn",
+    "CRSArrTime",
+    "ArrTime",
+    "ArrDelay",
+    "ArrDelayMinutes",
+    "ArrivalDelayGroups",
+    "ArrTimeBlk",
+    "Cancelled",
+    "CancellationCode",
+    "Diverted",
+    "CRSElapsedTime",
+    "ActualElapsedTime",
+    "AirTime",
+    "Flights",
+    "Distance",
+    "FirstDepTime",
+    "TotalAddGTime",
+    "LongestAddGTime",
+    "DivAirportLandings",
+    "DivReachedDest",
+    "DivActualElapsedTime",
+    "DivArrDelay",
+    "DivDistance",
     "Div1Airport",
     "Div1AirportID",
     "Div1AirportSeqID",
@@ -69,8 +132,9 @@ drop_columns = [
 class FileSourceEnum(Enum):
     """Simple enum to help differentiate when running on kaggle or local."""
 
-    LOCAL = ("local", Path.cwd().parent / "raw")
+    NOTEBOOK = ("notebook", Path.cwd().parent)
     KAGGLE = ("kaggle", Path("/kaggle/input"))
+    LOCAL = ("local", Path.cwd())
 
     def __init__(self, title: str, path: Path):
         self._title = title
@@ -81,7 +145,7 @@ class FileSourceEnum(Enum):
         return self._title
 
     @property
-    def path(self) -> Path:
+    def root_dir(self) -> Path:
         return self._path
 
 
@@ -89,29 +153,22 @@ def get_location() -> FileSourceEnum:
     """Returns the FileSoureEnum based on the location. Errors if neither local
     or kaggle is found.
     """
-    if FileSourceEnum.KAGGLE.path.exists():
+    if FileSourceEnum.KAGGLE.root_dir.exists():
         return FileSourceEnum.KAGGLE
-    elif FileSourceEnum.LOCAL.path.exists():
+    elif Path.cwd().name == "exploration":
+        return FileSourceEnum.NOTEBOOK
+    elif FileSourceEnum.LOCAL.root_dir.exists():
         return FileSourceEnum.LOCAL
     else:
         raise FileNotFoundError(
-            f"couldn't find Kaggle files or local files "
-            + "in {FileSourceEnum.LOCAL.path}"
+            f"couldn't find Kaggle files or local files"
         )
 
-
-# def get_file_generator() -> Generator:
-#     """Create a simple generate for the files found in the FileSourceEnum Path."""
-#     for child in get_location().path.iterdir():
-#         if child.is_dir():
-#             yield from get_file_generator(child)
-#         else:
-#             yield child
 
 
 def _get_csv_by_name(name: str) -> Path:
     """Get a single CSV file by name"""
-    files = list(get_location().path.rglob(name))
+    files = list(get_location().root_dir.rglob(name))
     if len(files) > 0:
         return files[0]
     raise ValueError("Can't find file")
@@ -119,12 +176,12 @@ def _get_csv_by_name(name: str) -> Path:
 
 def _get_csv_by_year(year: int) -> List[Path]:
     """Get a list of CSV files by year"""
-    return list(get_location().path.rglob(f"Flights_{year}_*.csv"))
+    return list(get_location().root_dir.rglob(f"Flights_{year}_*.csv"))
 
 
 def _get_all_csv_files() -> List[Path]:
     """Get all the CSV files"""
-    return list(get_location().path.rglob("*.csv"))
+    return list(get_location().root_dir.rglob("*.csv"))
 
 
 def _get_df_from_csv(
@@ -153,21 +210,24 @@ def _get_df_from_csv(
 
 
 def _save_df(name: str, df: pd.DataFrame) -> None:
-    if get_location() != FileSourceEnum.LOCAL:
+    location = get_location()
+    if location not in [FileSourceEnum.NOTEBOOK, FileSourceEnum.LOCAL]:
         raise ValueError("Can't save when not running locally")
-
+    
+    res_dir = location.root_dir / "res"
     res_dir.mkdir(parents=True, exist_ok=True)
     df.to_pickle(res_dir.resolve() / name)
 
 
 def _load_pickle(file: str) -> pd.DataFrame:
-    if get_location() == FileSourceEnum.LOCAL:
-        return pd.read_pickle(res_dir / file)
+    location = get_location()
+    if location in [FileSourceEnum.NOTEBOOK, FileSourceEnum.LOCAL]:
+        return pd.read_pickle(location.root_dir / "res" / file)
     raise ValueError("Not local bro!")
 
 
 def get_df(
-    drop_columns=drop_columns,
+    drop_columns: List[str] =drop_columns,
     *,
     year: int = None,
     file: str = None,
@@ -187,6 +247,9 @@ def get_df(
     :rtype: pd.DataFrame
     :raises ValueError: If no arguments are provided
     """
+
+    location = get_location()
+    res_dir = location.root_dir / "res"
 
     if all(e is None for e in [file, year]) and not all_files:
         raise ValueError("You need at least one parameter dude")

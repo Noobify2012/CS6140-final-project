@@ -60,9 +60,10 @@ def airlineAnalysis(frame: pd.DataFrame, resDir:str):
     ax.barh(airline_counts.index, airline_counts.values, align='center')
     ax.set_xlabel('Count')
     ax.set_ylabel('Airline')
-    ax.set_title('Number of Flights by Airline')
+    ax.set_title('Number of Flights by Airline ' + resDir)
     # plt.show()
-    plt.savefig("../img/" + resDir +"_airlineAnalysis.jpg")
+    plt.savefig("../img/eda/" + resDir +"_airlineAnalysis.jpg")
+    return fig
 
 
 def originAnalysis(frame: pd.DataFrame, num : int, resDir:str):
@@ -72,8 +73,9 @@ def originAnalysis(frame: pd.DataFrame, num : int, resDir:str):
     ax.barh(airline_counts.index, airline_counts.values, align='center')
     ax.set_xlabel('Count')
     ax.set_ylabel('Origin')
-    ax.set_title('Number of Flights by Origin')
-    plt.savefig("../img/" + resDir +"_originAnalysis.jpg")
+    ax.set_title('Number of Flights by Origin ' + resDir)
+    plt.savefig("../img/eda/" + resDir +"_originAnalysis.jpg")
+    return fig
 
 
 
@@ -84,8 +86,9 @@ def destAnalysis(frame: pd.DataFrame, num : int, resDir:str):
     ax.barh(airline_counts.index, airline_counts.values, align='center')
     ax.set_xlabel('Count')
     ax.set_ylabel('Destination')
-    ax.set_title('Number of Flights by Destination')
-    plt.savefig("../img/" + resDir +"_destAnalysis.jpg")
+    ax.set_title('Number of Flights by Destination ' + resDir)
+    plt.savefig("../img/eda/" + resDir +"_destAnalysis.jpg")
+    return fig
 
 
 def delay15Analysis(frame: pd.DataFrame, resDir:str):
@@ -95,8 +98,9 @@ def delay15Analysis(frame: pd.DataFrame, resDir:str):
     ax.barh(airline_counts.index, airline_counts.values, align='center')
     ax.set_xlabel('Number of Flights')
     ax.set_ylabel('Delayed')
-    ax.set_title('Number of Flights Delayed ')
-    plt.savefig("../img/" + resDir +"_delay15Analysis.jpg")
+    ax.set_title('Number of Flights Delayed ' + resDir)
+    plt.savefig("../img/eda/" + resDir +"_delay15Analysis.jpg")
+    return fig
 
 
 # def delayAnalysis(frame: pd.DataFrame):
@@ -107,6 +111,9 @@ def delay15Analysis(frame: pd.DataFrame, resDir:str):
 
 def delayPlots(frame: pd.DataFrame, resDir:str):
     delayList = ['CarrierDelay', 'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay']
+    # X = 0
+    # Y = 0
+    # fig, ax = plt.subplots(3, 2)
     for delay in delayList:
         delayString = delay + ' > 0.0'
         delayFrame = frame.query(delayString)
@@ -115,8 +122,18 @@ def delayPlots(frame: pd.DataFrame, resDir:str):
         ax.barh(airline_counts.index, airline_counts.values, align='center')
         ax.set_xlabel('Count of Occurances')
         ax.set_ylabel('Delay Time')
-        ax.set_title('Top 20 Occurances of Delays from ' + str(delay))
-        plt.savefig("../img/" + resDir +"_"+delay+"Analysis.jpg")
+        ax.set_title('Top 20 Occurances of Delays from ' + str(delay)  + ' ' + resDir)
+        plt.savefig("../img/eda/" + resDir +"_"+delay+"Analysis.jpg")
+    #     if (X == 0 & Y == 0) | (X == 1 & Y == 0):
+    #         axis[X,Y].plot(fig)
+    #         Y+= 1
+    #     elif (X == 0 & Y == 1) | (X == 1 & Y == 1):
+    #         axis[X,Y].plot(fig)
+    #         Y = 0
+    #         X += 1
+    #     else:
+    #         axis[X,Y].plot(fig)
+    # return fig
     
     # # filter out no delay data 0 min or less
     # carrierFrame = frame.query('CarrierDelay > 0.0')
@@ -137,14 +154,15 @@ def delayPlots(frame: pd.DataFrame, resDir:str):
 def boxplotData(frame: pd.DataFrame, resDir:str):
     # df = pd.melt(frame['CarrierDelay', 'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay'])
     boxplot = frame.boxplot(column=['CarrierDelay', 'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay'], rot=45)
-    plt.title("Delays by Type, Time and Occurance")
+    plt.title("Delays by Type, Time and Occurance " + resDir)
     plt.ylabel("Time in Minutes")
     
     # boxplot_data = [frame['CarrierDelay'], frame['WeatherDelay'], frame['NASDelay'], frame['SecurityDelay'], frame['LateAircraftDelay']]
     # fig, ax = plt.subplots()
     # ax.boxplot(boxplot_data)
     # ax.set_xticklabels(['CarrierDelay', 'WeatherDelay', 'NASDelay', 'SecurityDelay', 'LateAircraftDelay'], rotation=45)
-    plt.savefig("../img/" + resDir +"_delayBoxPlot.jpg")
+    plt.savefig("../img/eda/" + resDir +"_delayBoxPlot.jpg")
+    return boxplot
     # plt.show()
 
 
@@ -161,6 +179,10 @@ def delayCounts(frame: pd.DataFrame, resDir:str):
     median_security_delay = frame['SecurityDelay'].median()
     median_la_delay = frame['LateAircraftDelay'].median()
     print("Median Carrier Delay: " + str(median_carrier_delay) + "\nMedian Weather Delay: " + str(median_weather_delay) + "\nMedian National Airspace Delay: " + str(median_nas_delay) + "\nMedian Security Delay: " + str(median_security_delay) + "\nMedian Late Aircraft Delay: " + str(median_la_delay))
+    # Append-adds at last
+    # file1 = open("myfile.txt", "a")  # append mode
+    # file1.write("Today \n")
+    # file1.close()
 
 
 
@@ -171,17 +193,19 @@ def DistanceAnalysis(frame: pd.DataFrame, num: int, resDir:str):
     ax.barh(airline_counts.index, airline_counts.values, align='center')
     ax.set_xlabel('Count')
     ax.set_ylabel('Distance Group')
-    ax.set_title('Number of Flights by Distance Group')
-    plt.savefig("../img/" + resDir +"_DistanceAnalysis.jpg")
+    ax.set_title('Number of Flights by Distance Group ' + resDir)
+    plt.savefig("../img/eda/" + resDir +"_DistanceAnalysis.jpg")
+    return fig
+    # /Users/Owner/Documents/CS6140/project/CS6140-final-project/img/eda
 
 
 
 def delayPercentage(frame: pd.DataFrame, resDir:str):
     delayed = frame['ArrDel15'].value_counts()[1.0]
     notDel = frame['ArrDel15'].value_counts()[0.0]
-def delayPercentage(frame: pd.DataFrame):
-    delayed = frame["ArrDel15"].value_counts()[1.0]
-    notDel = frame["ArrDel15"].value_counts()[0.0]
+# def delayPercentage(frame: pd.DataFrame):
+    # delayed = frame["ArrDel15"].value_counts()[1.0]
+    # notDel = frame["ArrDel15"].value_counts()[0.0]
     total = delayed + notDel
     percentage = (delayed / notDel) * 100
     # print('value of delayed: ' + str(delayed))
@@ -190,24 +214,31 @@ def delayPercentage(frame: pd.DataFrame):
 
 
 def runEDA(df: pd.DataFrame, resDir:str) -> pd.DataFrame:
+    # fig, ax = plt.subplots(3, 2)
     # Show the number of flights by airline
-    airlineAnalysis(df, resDir)
+    airline = airlineAnalysis(df, resDir)
+    # ax[0,0].plot(airline)
     # Show the number of flights by origin
-    originAnalysis(df, 20, resDir)
+    origin = originAnalysis(df, 20, resDir)
+    # ax[0,1].plot(origin)
     #show the number of flights by destination
-    destAnalysis(df, 20, resDir)
+    dest = destAnalysis(df, 20, resDir)
+    # ax[1,0].plot(dest)
     # duplicated method for number of flights delayed
-    delay15Analysis(df, resDir)
+    delay = delay15Analysis(df, resDir)
+    # ax[1,1].plot(delay)
     # show the plots of all the differnt delay types
-    delayPlots(df, resDir)
+    delayPlot = delayPlots(df, resDir)
     # show all of the delay types on a single boxplot
-    boxplotData(df,resDir)
+    # boxplotData(df,resDir)
     # get the mean and median of the differnt types of delay
     delayCounts(df, resDir)
     # show the number of flights by distance group
-    DistanceAnalysis(df, 20, resDir)
+    dist = DistanceAnalysis(df, 20, resDir)
+    # ax[2,0].plot(dist)
     # Calculate percentage of flights that are delayed
     delayPercentage(df, resDir)
+    # plt.show()
 
 
 # one hot encode origin and destination
